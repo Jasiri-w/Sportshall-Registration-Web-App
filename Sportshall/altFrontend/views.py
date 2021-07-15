@@ -1,10 +1,15 @@
 from django.shortcuts import render
+from django.conf import settings
+
 from .models import Student, EventTemplate, EventInstance, Registration, Schedule  
 from django.contrib.auth.models import User
+
+from .updates import *
+
 import datetime
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
 from json import dumps, loads
+
+from django.core.files.storage import FileSystemStorage
 
 # Create your views here.
 def dummyView(request, *args, **kwargs):
@@ -47,6 +52,8 @@ def sheetView(request, event_id, *args, **kwargs):
 def homeView(request, *args, **kwargs):
     #currentevents = EventInstance.objects.filter(event_date=datetime.datetime.now().strftime("%A"))
     
+    updateInstanceModel()
+
     allevents = EventInstance.objects.all()
     upcomingevents = []
     for event in allevents :
@@ -140,6 +147,8 @@ def scheduleView(request, *args, **kwargs ):
                     template_id_id = raw_table_data[event]["templateID"],
                 )
                 newSchedule.save()
+
+            updateInstanceModel()
 
     schedule = {}
     for event in Schedule.objects.all():
