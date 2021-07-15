@@ -29,8 +29,8 @@
             <input type="submit" name="savebtn" id="savebtn" value="Save">
             <!--<button type="submit" id="resetSchedule"></button>-->
         </form>
-        <button class="clearbtn" onclick="clearEvents()">Clear All</button>
-        <button class="clearbtn" onclick="displayEvents()">Revert to last Save</button>
+            <button class="clearbtn" onclick="clearEvents()">Clear All</button>
+            <button class="clearbtn" onclick="revertSave()">Revert to last Save</button>
     </div>
     <table id="scheduleTable">
         <body>
@@ -253,6 +253,11 @@
                 }
             }
         }
+    }
+    function revertSave(){
+        clearEvents();
+        displayEvents();
+        color();
     }
     
     counter = 0;
