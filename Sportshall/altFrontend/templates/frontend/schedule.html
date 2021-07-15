@@ -1,0 +1,331 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% block title %}Schedule{% endblock title%}
+{% block extraLinks%}
+    <link rel="stylesheet" type="text/css" charset="utf-8"  href="{% static "css/schedule.css" %}"/>
+{% endblock extraLinks%}
+{% block headtext %}
+	<h2>Weekly Schedule</h2>
+	<p>Last updated at time:o:clock</p>
+{% endblock headtext %}
+{% block container%}
+    <section id="scheduleContainer">
+    <div>
+        <h1>Add Activities</h1>
+        <div id="editRowContent" style="display: flex; clear: right;">
+            {% for event in EventTemplates%}
+                <div class="cellcontent edit" draggable="True" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" id="{{ event.template_id }}">
+                <p> {{event.event_name}} </p><span>Year {{event.year_group}} {{event.gender}}'s</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <h1>This Weeks Schedule</h1>
+    <div id="saveTableButtonDiv">
+        <form method="post" onSubmit="fillInputs()" action="" id="saveTableForm">
+            {% csrf_token %}
+            <input type="hidden" name="userID" value="{{ user.id }}" id="">
+            <input type="hidden" name="tableData" value="" id="tableDataInput">
+            <input type="submit" name="savebtn" id="savebtn" value="Save">
+            <!--<button type="submit" id="resetSchedule"></button>-->
+        </form>
+        <button class="clearbtn" onclick="clearEvents()">Clear All</button>
+        <button class="clearbtn" onclick="displayEvents()">Revert to last Save</button>
+    </div>
+    <table id="scheduleTable">
+        <body>
+            <tr id="tableHeaders">
+                <th>Time</th>
+                <td colspan="1" class="">Monday</td>
+                <td colspan="1" class="">Tuesday</td>
+                <td colspan="1" class="">Wednesday</td>
+                <td colspan="1" class="">Thursday</td>
+                <td colspan="1" class="">Friday</td>
+                <td colspan="1" class="">Saturday</td>
+                <td colspan="1" class="">Sunday</td>
+            </tr>
+            <tr>
+                <th>Morning</th>
+                <!--<td colspan="1" rowspan="2" class="green" id="test"><p></p><span></span></td>-->
+            </tr>
+            <!--<tr>
+                <th>Lunch</th>
+                
+            </tr>
+            <tr>
+                <th>Games</th>
+                
+            </tr>-->
+            <tr>
+                <th>Evening</th>
+                
+            </tr>
+            
+        </body>
+    </table>
+    <div id = "upload">
+        <h3>Upload a schedule (.csv)</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="document" id="document"/>
+            <button type="submit">Upload</button>
+            
+        </form>
+        {% if file_url %}
+            <p>Uploaded file: <a href="{{file_url}}" target="_blanks">{{ file_url }}</a></p>
+        {% endif %}
+
+    </div>
+    </section>
+{% endblock %}
+{% block scripts %}
+<script>
+    var data = JSON.parse("{{JSON|escapejs}}");
+    dataNode = document.getElementById('neatdata');
+    rows = document.querySelector("#scheduleTable>tbody").children;
+    columns = document.querySelector("#tableHeaders");
+    colors = ["green","light-blue", "orange" , "red"];
+    //console.log("File mf url: {{ file_url }}");
+    scheduleData = {};
+    rowHeaders = {};
+    columnHeaders = {};
+    cellHtmlSet = {}
+    eventDisplayProperties = {}
+    for(var row = 0;row < rows.length; row++){
+        rowHeaders[rows[row].children[0].innerText] = row;
+    }
+    for(var col = 0;col < columns.children.length; col++){
+        columnHeaders[columns.children[col].innerText] = col;
+    }
+    function invertDict(dict){
+        var newDict = {};
+        for(var el in dict){
+            newDict[dict[el]] = el;
+        }
+        console.log(newDict);
+        return newDict;
+    }
+
+    function deleteEvent(el){
+        el.remove();
+    }
+
+    function clearEvents(el){
+        eventCopies = document.querySelectorAll(".cellcontent.copy");
+        for(var x = 0; x < eventCopies.length; x++){
+            eventCopies[x].remove();
+        }
+    }
+
+    function generateID() {
+        return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(2, 10) + Date.now();
+    }
+
+    function fillInputs(){
+        for(var row = 0;row < rows.length;row++){
+            for(var cell = 0;cell < document.querySelector("#tableHeaders").children.length;cell++){
+                //console.log(rows[row].children[cell], rows[row].children[cell].children.length);
+                if(rows[row].children[cell].children.length == 0){
+                    continue;
+                }
+                var currentCell = rows[row].children[cell];
+                
+                for(var elem = 0; elem < rows[row].children[cell].children.length;elem++){
+                    var currentEventElement = currentCell.children[elem];
+                    var newEntry = {
+                        htmlID: currentEventElement.id,
+                        session: rows[row].children[0].innerText,
+                        day: rows[0].children[cell].innerText,
+                        templateID: currentEventElement.getAttribute("data-template-id"),
+                    }
+                    scheduleData[currentEventElement.id] = newEntry;
+                }
+            }
+        }
+        //console.table(scheduleData);
+        document.querySelector("#tableDataInput").value = JSON.stringify(scheduleData);
+        //console.log(document.querySelector("#tableDataInput").value);
+    }
+
+    function color(){
+        var counter = 0;
+        for(var event in data['EventTemplates']){
+            var newEventDetails = {
+                templateID: data['EventTemplates'][event]["template_id"],
+                color: colors[counter],
+                
+            }
+            eventDisplayProperties[newEventDetails.templateID] = newEventDetails;
+            counter++;
+        }
+        var allTabledEvents = document.querySelectorAll(".cellcontent");
+        for(var i = 0;i < allTabledEvents.length;i++){
+            allTabledEvents[i].setAttribute('data-color', eventDisplayProperties[allTabledEvents[i].getAttribute("data-template-id")]["color"]);
+        }
+        console.log("Colors Refreshed.")
+    }
+
+    function allowDrop(ev,el) {
+        for(var clas of event.target.classList){
+            if(clas == "cellcontainer"){
+                ev.preventDefault();
+            }
+        }
+    }
+
+    function drag(ev, el){
+        ev.dataTransfer.setData("text", ev.target.id);
+        el.style.opacity = '0.4';
+    }
+
+    function drop(ev,el) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        
+        var istemp = false;
+        for(var clas of document.getElementById(data).classList){
+            if(clas == "edit"){
+                istemp=true;
+            }
+        }
+
+        if(istemp){
+            var elcopy = document.getElementById(data).cloneNode(true);
+            elcopy.id = generateID();
+            elcopy.classList.remove("edit");
+            elcopy.classList.add("copy");
+            elcopy.style.opacity='1';
+            elcopy.setAttribute("data-template-id", data);
+            ev.target.appendChild(elcopy);
+
+            color();
+        }else{
+            ev.target.append(document.getElementById(data));
+        }
+
+        for(var clas of event.target.classList){
+            if(clas == "over"){
+                event.target.classList.remove('over');
+            }
+        }
+        fillInputs();
+    }
+
+    function endDrag(ev, el){
+        el.style.opacity = '1';
+        for(var clas of event.target.classList){
+            if(clas == "over"){
+                event.target.classList.remove('over');
+            }
+        }
+    }
+
+    function dragEnter(ev,el) {
+        el.classList.add('over');
+    }
+
+    function dragLeave(ev,el) {
+        el.classList.remove('over');
+    }
+
+    function fillEmptyCells(){
+        for(var row of rows){
+            for(var c = 0;c <= 7 && row.children.length <= 7;c++){
+                newEmptyCell = '<td colspan="1" class="cellcontainer" ondrop="drop(event,this)" ondragover="allowDrop(event)"  ondragenter="dragEnter(event, this)" ondragleave="dragLeave(event,this)"></div></td>';
+                row.innerHTML += newEmptyCell;
+            }
+        }
+    }
+    
+    function displayEvents(){
+        //console.log("Displaying...");
+        for(var row = 0; row < rows.length; row++){
+            //console.log("Row:" + row);
+            for(var col = 0; col < columns.children.length; col++){
+                //console.log("Column:" + col);
+                if(rows[row].children[col].innerHTML == "" && typeof cellHtmlSet[invertDict(rowHeaders)[row]][invertDict(columnHeaders)[col]] != "undefined"){
+                    //row=0
+                    //col=0
+                    //rowHeaders[row] = time
+                    //cellHtmlSet[]
+                    rows[row].children[col].innerHTML += cellHtmlSet[invertDict(rowHeaders)[row]][invertDict(columnHeaders)[col]];
+                    //console.log(rows[row].children[col]);
+                }
+            }
+        }
+    }
+    
+    counter = 0;
+    console.log("Table:")
+    console.table(data["Schedule"])
+    /**for(var y =0;y < columns.length;y++){
+        var newHtml = {
+            
+        }
+    }**/
+    fillEmptyCells();
+    for(var x in data["Schedule"]){
+        fcounter = counter + 1;
+        /*if(fcounter >= rows.length){
+            break;
+        }*/
+        counter++;
+        //console.log("Counter: " + counter + "\nEvent: " + data['EventTemplates'][x]["event_name"] + "\nYear: " + data['EventTemplates'][x]["year_group"]  + "\ndata['EventTemplates'].x: " + data['EventTemplates'][x]);
+        newEventElem = '<div id="' + generateID() +'"class="cellcontent copy" data-color="" draggable="True" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" data-template-id="' + data['EventTemplates'][data["Schedule"][x].template_id_id]["template_id"] +'"><p>'+ data['EventTemplates'][data["Schedule"][x].template_id_id]["event_name"] +'</p><span>Year '+ data['EventTemplates'][data["Schedule"][x].template_id_id]["year_group"] + ' ' +data['EventTemplates'][data["Schedule"][x].template_id_id]["gender"] + 's</span></div></td>';
+        /*console.log("Session: " + data["Schedule"][x]["session"]);
+        console.log("Day :" + data["Schedule"][x]["day"]);
+        console.log("Row Header: " + rowHeaders[data["Schedule"][x]["session"]]);
+        console.log("Column Header: " + columnHeaders[data["Schedule"][x]["day"]]);
+        console.log(cellHtmlSet);*/
+        // If both the session and day exist in the dictionary then append the html to the already existent dictionary entry
+        /*if (cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]] != undefined && cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]][columnHeaders[data["Schedule"][x]["day"]]] != undefined){
+            cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]][toString(columnHeaders[data["Schedule"][x]["day"]])] += newEventElem;
+        //If the day (eg "Monday") exists but the session (eg "Morning") doesn't exist then create a new one and add/
+        //If the day doesn't exist then create both and add
+        }else{
+            cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]] = toString(columnHeaders[data["Schedule"][x]["day"]]);
+            //cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]][columnHeaders[data["Schedule"][x]["day"]]];
+            console.log("Simple Break for the damn deebugger")
+            cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]][toString(columnHeaders[data["Schedule"][x]["day"]])] = newEventElem;
+        }*/
+        //if the day exists only create a new day not rewrite session
+        if(typeof cellHtmlSet[data["Schedule"][x]["session"]] == "undefined"){
+            cellHtmlSet[data["Schedule"][x]["session"]] = {};
+            cellHtmlSet[data["Schedule"][x]["session"]][data["Schedule"][x]["day"]] = newEventElem;
+        }else if(typeof cellHtmlSet[data["Schedule"][x]["session"]][data["Schedule"][x]["day"]] == "undefined"){
+            cellHtmlSet[data["Schedule"][x]["session"]][data["Schedule"][x]["day"]] = newEventElem;
+        }else{
+            cellHtmlSet[data["Schedule"][x]["session"]][[data["Schedule"][x]["day"]]] += newEventElem;
+        }
+
+        /*try{
+            cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]][toString(columnHeaders[data["Schedule"][x]["day"]])] += newEventElem;
+        }catch(err){
+            cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]] = toString(columnHeaders[data["Schedule"][x]["day"]]);
+            //cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]][columnHeaders[data["Schedule"][x]["day"]]];
+            console.log(cellHtmlSet);
+            cellHtmlSet[rowHeaders[data["Schedule"][x]["session"]]][toString(columnHeaders[data["Schedule"][x]["day"]])] = newEventElem;
+        }*/
+    }
+    displayEvents();
+
+    counter= 0;
+    for(var x in data["EventTemplates"]){
+        parent = document.querySelector("#editRowContent");
+        newEditElem = '<div class="cellcontent edit" draggable="True" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" data-color="" data-template-id="' + data['EventTemplates'][x]["template_id"] +'" id="' + data['EventTemplates'][x]["template_id"] +'"><p>'+ data['EventTemplates'][x]["event_name"] +'</p><span>Year '+ data['EventTemplates'][x]["year_group"] + ' ' +data['EventTemplates'][x]["gender"] + 's</span></div>';
+        parent.innerHTML +=newEditElem;
+        counter++;
+    }
+
+    color();
+    
+    /*for(var x in data['EventTemplates']){
+        console.log("X: " + x)
+        document.querySelectorAll("#test").innerHTML = y;
+        for(var z in data['EventTemplates'][]){
+            console.log(z);
+            document.querySelectorAll('#test > span').innerHTML = z;
+        }
+    }*/
+    </script>
+{% endblock scripts%}

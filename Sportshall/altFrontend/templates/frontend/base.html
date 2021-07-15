@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block metas %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+    {% endblock metas %}
+    <title> {% block title %} Page Title {% endblock title %}</title>
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" charset="utf-8"  href="{% static "css/main.css" %}"/>
+    {% block extraLinks%}
+    {% endblock extraLinks%}
+    <style>
+    {% block style %}
+    {% endblock style %}
+    </style>
+</head>
+<body>
+    {% load tagextras %}
+    <div id="sidebar" class="sidenav">
+        {% block sidebar %}
+		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+		<a href="/">Home</a>
+        <a href="/schedule/">Week Schedule</a>
+		<!--<a href="/add-new-student/">Add Student</a>-->
+        {% if user|has_group:"Teacher" or user.is_superuser %}
+        <hr>
+		<a href="/edit-events/">Create Activity</a>
+        {%endif%}
+        <section id="bottom" style = "position: absolute; bottom: 100px;">
+		    {% if user.is_authenticated%}
+                <a href="#">Settings</a>
+                {% if user.is_superuser%}
+                <a href="/admin/">Django Admin</a>
+                {% endif %}
+            {% endif %}
+        </section>
+        {% endblock %}
+	</div>
+
+    <div id="main">
+        
+        <div id = "topbar" style="float: right;">
+        {% block topbar %}
+        
+            {% if user.is_authenticated %}
+                <em>Hi, Welcome back</em> <strong>{{ user.first_name }}</strong> !
+                <p style="text-align:end;"><a href="{% url 'account_logout' %}">Log Out</a></p>
+            {% else %}
+                <p>You are not logged in</p>
+                <p style="text-align:end;"><a href="{% url 'account_login' %}">Log In</a>
+            {% endif %}
+        {% endblock topbar %}
+        </div>
+        {% block top %}
+        {% endblock top %}
+
+        {% block main%}
+            <div id="head">
+            {%block head%}
+                <section id = "headtext">
+                    {% block headtext %}
+                        <h2>Sportshall Sign-Up</h2>
+                        <p>Sportshall activity registration web application</p>
+                    {% endblock headtext %}    
+                </section>
+                <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; menu</span>
+            {% endblock head%}
+            </div>
+		<div id="container">
+            {% block container%}
+
+                <div id="column1" class="column">
+                    {% block column1 %}
+                    {% endblock column1 %}
+                </div>
+                <div id="column2" class="column">
+                    <!--Names e.g John on second column-->
+                    {% block column2 %}
+                    {% endblock column2%}
+                </div>
+
+            {% endblock container %}
+		<div>
+		<div id="container2">
+            {% block container2 %}
+
+            {% endblock container2 %}
+		<div>
+        {% endblock main %}
+	</div>
+    <script src="{% static "js/sidebar.js " %}"></script>
+    {% block scripts%}
+    {% endblock scripts%}
+</body>
+</html>

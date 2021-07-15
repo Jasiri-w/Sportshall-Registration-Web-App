@@ -1,0 +1,71 @@
+{% extends "frontend/base.html"%}
+{% block title%}
+Home
+{% endblock title%}
+
+{% block top%}
+<div id="title">
+    <h1>Sportshall Registration Web app</h1>
+</div>
+{% endblock top %}
+{% block container%}
+<!--<h2><a href="">Dasboard > </h2>-->
+{% endblock %}
+{%block container2%}
+{% load tagextras %}
+{% if user|has_group:"Teacher" or user.is_superuser %}
+    <section>
+        <h2>Activities<h4><em> ~ Add an activity to today's schedule</em></h4></h2>
+        {%for event in AllEvents%}
+            <div class="eventBlock teacher">
+                <h3>{{event.event_name}}</h3>
+                <p>{{event.gender}}</p>
+                <p>Year {{event.year_group}}</p>
+                <form action="/add-event-to-today/" method="post">
+                    <input type="submit"  id="addButton" class="addBtn" value="Add Activity"></input>
+                </form>
+            </div>
+        {%empty%}
+            <p>Create Some Events</p>
+        {%endfor%}
+    </section>
+{% endif %}
+
+{% if user.is_authenticated %}
+
+    <section class="row" id="row1">
+        <h2 class="rowTitle">Upcoming Events</h2>
+        <div class="eventBlockContainer">
+            {% for event in UpcomingEvents %}
+                <div class="eventBlock">
+                    <form action="/sign-up/" method="post" onSubmit="" id="signUpForm">
+                        {%csrf_token%}
+                        {{ form.as_p }}
+                        <h3>{{ event.event_name }}</h3>
+                        <p>Capacity Placeholder</p>
+                        <input type="hidden" name="userID" value="{{ user.id  }}"></input>
+                        <input type="hidden" name="sportID" value="{{ event.sport_id }}"></input>
+                        <input type="submit"  id="addButton" class="addBtn" value="Sign Up"></input>
+                        <a href="/sheet/{{event.sport_id}}">View List > </a>
+                    </form>
+                </div>
+            {% empty%}
+                <p>No events tonite</p>
+            {% endfor %}
+        </div>
+    </section>
+    <section class="row" id="row2">
+        <h2 class="rowTitle">Events you're signed up for</h2>
+        <div class="eventBlockContainer">
+            
+        </div>
+    </section>
+{% else %}
+    <p>Login to see activities for tonite</p>
+{%endif%}
+{%endblock%}
+
+{% block headtext %}
+<h1>Home</h1>
+<p>Sign up for Today's Activities</p>
+{% endblock headtext %}

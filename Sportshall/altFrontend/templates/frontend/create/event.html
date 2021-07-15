@@ -1,0 +1,59 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% block title %}Create Event{% endblock title%}
+
+{% block headtext %}
+	<h2>Add New Event</h2>
+	<p>Add a new event / activity to the schedule</p>
+{% endblock headtext %}
+{%block container%}
+{%endblock container%}
+{% block container2%}
+	{% if not Valid %}
+	<p style="color: Red;"><em>{{ Message }}</em></p>
+	{% endif %}
+	<section class="row" id="row1">
+		<h2>All Activities</h2>
+		<div class="eventBlockContainer">
+		{% for event in AllEventTemplates%}
+			<div class="eventBlock teacher">
+                <h3>{{event.event_name}}</h3>
+                <p>{{event.gender}}</p>
+                <p>Year {{event.year_group}}</p>
+            </div>
+        {%empty%}
+			<p>Create Some Activities</p>
+		{%endfor%}
+		</div>
+	</section>
+
+	<section class="row" id="row2">
+		<h2>Create a new Activity</h2>
+		<div class="eventBlockContainer">
+		<form action="/create-event/" method="post" id="eventForm">
+			{% csrf_token %}
+			<p><em><strong>Event Name: </strong></em> <input type="text" name="eventname" id="eventname" value="" required></input></p>
+			<p><em><strong>Gender</strong></em></p>
+			{% for Gender in Genders %}
+				<input type="radio" id="{{ Gender }}" name="gender" value="{{ Gender }}" required>
+  				<label for=" {{ Gender }} ">{{ Gender }}</label><br>
+			{% endfor %}
+			</p>
+			<p><em><strong>Year Group</strong></em> <input list="yeargroups" name="yeargroup" id="yeargroup" value="" required/></p>
+			<datalist id="yeargroups">
+				{% for year in YearGroups %}
+					<option value={{ year }}>
+				{% endfor %}
+			</datalist>
+			<p><em><strong>Maximum Capacity: </strong></em> <input type="number" min="5" max="20" name="maxcap" id="maxcap" value="20" required></input></p>
+			<input type="submit"  id="addButton" class="addBtn" value="Add Event"></input>
+			<button type="reset" id='clearbtn'>Clear All</button>
+		</form>
+		</div>
+	</section>
+{% endblock container2%}
+{% block scripts %}
+<script>
+
+</script>
+{% endblock scripts%}

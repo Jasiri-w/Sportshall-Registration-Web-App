@@ -1,0 +1,30 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% block title %}Login{% endblock title%}
+
+{% block headtext %}
+	<h2>Login</h2>
+	<p>Interesting Subheading</p>
+{% endblock headtext %}
+{% block column1%}
+	{% comment %}
+	{% if not Valid %}
+	<p style="color: Red;"><em>{{ Message }}</em></p>
+	{% endif %}
+	{% endcomment %}
+	<p>
+		<form method="post">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<button type="submit">Log In</button>
+		</form>
+	</p>
+
+	
+
+{% endblock column1 %}
+{% block scripts %}
+<script>
+
+</script>
+{% endblock scripts%}

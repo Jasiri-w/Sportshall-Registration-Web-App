@@ -1,0 +1,212 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% block title %}Sheet View{% endblock title%}
+
+{% block headtext %}
+	<h2>{{ Event.sport_name }} List</h2>
+	<p>All students signed up for {{ Event.sport_name }}</p>
+{% endblock headtext %}
+{% block column1%}
+	{% load tagextras %}
+
+	{% if user|has_group:"Teacher" or user.is_superuser %} 
+		<p>
+			<form action="/addName/" method="post" onSubmit="return addCycle(event)" id="inputForm">
+				{% csrf_token %}
+				<!--<input type="text" id="newNameInput" value=""></input>-->
+				<input list="names" name="newNameInput" id="newNameInput" value=""/>
+				<datalist id="names">
+					{% for Student in Students %}
+						<option value={{ Student.student_first_name }}>
+					{% endfor %}
+				</datalist>
+				<input type="submit"  id="addButton" class="addBtn" value="Add"></input>
+				<button type="reset" id='clearbtn'>Clear All</button>
+
+			</form>
+		</p>
+	{% else %}
+		<p>
+			<form action="/sign-up/" method="post" onSubmit="" id="signUpForm">
+				{%csrf_token%}
+				{{ form.as_p }}
+				<p>Max: {{ Event.maximum_capacity }}</p>
+				<input type="hidden" name="userID" value="{{ user.id  }}"></input>
+				<input type="hidden" name="sportID" value="{{ Event.sport_id }}"></input>
+				<input type="submit"  id="addButton" class="addBtn" value="Sign Up"></input>
+			</form>
+		</p>
+	{% endif %}
+	{% comment %}{% for r in Registered%}
+		<p class='name' onclick='remove(this)' data-id="{{ r.registration_id }}"><em> " + u + ". " + names[i].name + " - " + names[i].bhouse + " - Year " + names[i].yeargroup + "</em></p>
+	{% endfor %}{%endcomment%}
+	{% for r in Registered %}
+		<p class="">{{ r.registration_id }} - {{ r.first_name }} - {{ r.sport_name }}</p>
+	{% endfor %}
+{% endblock column1%}
+{% block scripts %}
+<script>
+	/**var students = [
+		{{ Students }}
+	];
+	console.log(students);
+
+	for(var i = 0; i < {{ Students|length }};i++){
+		console.log( {{ Students }}[i]);
+		/**students.push({
+			id: {{ Students.student_id }},
+			firstname: "{{ Student.student_first_name }}",
+			lastname: "{{ Student.student_last_name }}",
+			bhouse: "{{ Student.boarding_house }}",
+			yeargroup: "{{ Student.year_group }}",
+			gender: "{{ Student.gender }}"
+		});
+	}**/
+	var students = [];
+	{% for Student in Students %}
+		students.push({
+			id: {{ Student.student_id }},
+			firstname: "{{ Student.student_first_name }}",
+			lastname: "{{ Student.student_last_name }}",
+			bhouse: "{{ Student.boarding_house }}",
+			yeargroup: "{{ Student.year_group }}",
+			gender: "{{ Student.gender }}"
+		});
+	{% endfor %}
+	for(var i = 0; i < students.length; i++){
+		console.log(students[i]);
+	};
+	var names = [];//["Ronaldo" , "Messi" , "Ontario" , "Margaux" , "Jameson", "Mallard" , "Lingard" , "Jenkins" , "Caboose" , "Sarge" , "Agent Texas" , "Agent Washington" , "Agent Mane"];
+	var container = document.getElementById("container");
+	var form = document.getElementById('inputForm');
+	var input = document.getElementById('newNameInput');
+	var addbtn = document.getElementById('addButton');
+	var clearBtn = document.getElementById('clearbtn');
+	var nameElems = document.querySelectorAll('.name'); //These will be added dynamically so this wont make sense like this
+	
+	
+	displayNames(names);
+	
+	//calls add and render function also prevents default
+	function addCycle(e){
+		e.preventDefault();
+		addName();
+		displayNames();
+	}
+	
+	addbtn.addEventListener("click", function(event) {
+		//alert("btn clicked");
+		// Number 13 is the "Enter" key on the keyboard
+		// Cancel the default action, if needed
+		event.preventDefault();
+		//alert("submitted");
+		addName();
+		displayNames();
+	});
+	
+	input.addEventListener("keyup", function(event) {
+		//alert("key press");
+		// Number 13 is the "Enter" key on the keyboard
+		if (event.keyCode === 13) {
+			// Cancel the default action, if needed
+			event.preventDefault();
+			addName();
+			displayNames();
+		}
+		event.preventDefault();
+	});
+
+	clearBtn.addEventListener("click", function(event) {
+
+		event.preventDefault();
+		console.log("Clearing");
+		clearAll();
+		displayNames();
+	});
+	
+	//added names to array
+	function displayNames(nameList){
+		
+		nameElems = document.querySelectorAll('.name');
+		
+		nameElems.forEach(function(a) {
+		  a.remove()
+		})
+		
+		var column1 = document.getElementById("column1");
+		var column2 = document.getElementById("column2");
+		var currentColumn = column1;
+		for(var i = 0; i < names.length; i++){
+			if(i >= 20){
+			   break;
+			}
+			if(i >= 10){
+				currentColumn = column2;
+			}
+			var u = i+1;
+			currentColumn.innerHTML += "<p class='name' onclick='remove(this)' data-id=" + names[i].signupid + "><em>" + u + ". " + names[i].name + " - " + names[i].bhouse + " - Year " + names[i].yeargroup + "</em></p>";// 1. John
+		}
+
+		document.getElementById('newNameInput').focus();
+		
+	}
+	
+	//adding names
+	function addName() {
+		var input = document.getElementById('newNameInput');
+		var buffer = input.value;
+		var newName = '';
+		for(var i = 0 ; i < students.length; i++){
+			if(buffer.toLowerCase() == students[i].firstname.toLowerCase()){
+				newName = students[i];
+			}
+		}
+		//console.log(newName);
+		
+		if(newName !== ''){
+		
+			const name = {
+				id : newName.id,
+				signupid : Date.now(),
+				name: newName.firstname + " " + newName.lastname,
+				bhouse: newName.bhouse,
+				yeargroup: newName.yeargroup,
+				gender: newName.gender
+				
+			};
+			names.push(name);
+			//console.log(names);
+		}
+		input.value = '';
+		input.focus();
+		
+	}
+	
+	//removing names
+	function remove(el) {
+		//console.log(el.getAttribute("data-id"));
+
+		for(var i = 0; i < names.length; i++){
+			//console.log(names[i].id);
+			if(names[i].signupid == el.getAttribute("data-id")){
+				//console.log(names[i].id);
+				names.splice(i,1);
+				el.remove();
+				//console.log(names);
+				//console.log("Name removed.");
+				displayNames();
+				return;
+			}
+		}
+		console.log("Indexed element outside of array. Name may not have been stored, or array not as long as specified.");
+	}
+
+
+	// clear all names
+	function clearAll(){
+		names = [];
+		displayNames();
+	}
+	
+</script>
+{% endblock scripts%}

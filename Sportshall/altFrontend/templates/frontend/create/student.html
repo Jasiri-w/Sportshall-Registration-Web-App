@@ -1,0 +1,54 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% block title %}Create View{% endblock title%}
+
+{% block headtext %}
+	{% if Valid %}
+		<p style="color: Green;"><em>{{ Message }}</em></p>
+	{% endif %}
+	<h2>Account Details</h2>
+	<p>Modify your account details</p>
+{% endblock headtext %}
+{% block column1%}
+	<p>
+		<form action="/create-student/" method="post" id="studentForm">
+			{% csrf_token %}
+			<input type="hidden" value="{{ user.id}}" name="userID">
+			<p><em><strong>First Name</strong></em> <input type="text" name="firstname" id="firstname" value="{{user.first_name}}" required></input></p>
+			<p><em><strong>Last Name</strong></em> <input type="text" name="lastname" id="lastname" value="{{user.last_name}}" required></input></p>
+			<p><em><strong>Boarding House</strong></em> <input list="bhouses" name="bhouse" id="bhouse" value="" required/></p>
+			<datalist id="bhouses">
+				{% for house in BoardingHouses %}
+					<option value={{ house }}>
+				{% endfor %}
+			</datalist>
+			<p>
+			<p><em><strong>Gender</strong></em></p>
+			{% for Gender in Genders %}
+				<input type="radio" id="{{ Gender }}" name="gender" value="{{ Gender }}" required>
+  				<label for=" {{ Gender }} ">{{ Gender }}</label><br>
+			{% endfor %}
+			</p>
+			<p><em><strong>Year Group</strong></em> <input list="yeargroups" name="yeargroup" id="yeargroup" value="" required/></p>
+			<datalist id="yeargroups">
+				{% for year in YearGroups %}
+					<option value={{ year }}>
+				{% endfor %}
+			</datalist>
+			<input type="submit"  id="addButton" class="addBtn" value="Save"></input>
+			<button type="reset" id='clearbtn'>Clear All</button>
+		</form>
+	</p>
+{% endblock column1 %}
+{% block column2 %}
+	
+	
+	
+	
+	
+{% endblock column2 %}
+
+{% block scripts %}
+<script>
+</script>
+{% endblock scripts%}
