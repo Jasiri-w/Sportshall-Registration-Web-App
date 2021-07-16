@@ -40,7 +40,7 @@ Home
         <div class="eventBlockContainer">
             {% for event in UpcomingEvents %}
                 <div class="eventBlock">
-                    <form action="/sign-up/" method="post" onSubmit="" id="signUpForm">
+                    <form action="" method="post" onSubmit="" id="signUpForm">
                         {%csrf_token%}
                         {{ form.as_p }}
                         <h3>{{ event.event_name }}</h3>
@@ -48,7 +48,7 @@ Home
                         <p>{{event.gender}}</p>
                         <p>Year {{event.year_group}}</p>
                         <input type="hidden" name="userID" value="{{ user.id  }}"></input>
-                        <input type="hidden" name="sportID" value="{{ event.sport_id }}"></input>
+                        <input type="hidden" name="templateID" value="{{ event.template_id }}"></input>
                         <input type="submit"  id="addButton" class="addBtn" value="Sign Up"></input>
                         <a href="/sheet/{{event.template_id}}">View List > </a>
                     </form>

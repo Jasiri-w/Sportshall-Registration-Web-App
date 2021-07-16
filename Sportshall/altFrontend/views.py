@@ -18,7 +18,7 @@ def dummyView(request, *args, **kwargs):
 def signUp(request, *args, **kwargs):
     newRegistration = Registration(
         registration_date = datetime.datetime.now(),
-        event_id_id = request.POST['sportID'],
+        event_id_id = request.POST['eventID'],
         user_id_id = request.POST['userID'],
     )
     newRegistration.save()
@@ -32,7 +32,7 @@ def signUp(request, *args, **kwargs):
 
 def sheetView(request, event_id, *args, **kwargs):
     #regset = Registration.objects.filter(sport_id = event_id)
-    query = "SELECT registration_id, event_date, event_name, username, first_name  FROM altFrontend_registration JOIN altFrontend_eventnstance ON sport_id = sport_id_id JOIN auth_user ON id = user_id_id WHERE event_date LIKE '"+ datetime.datetime.now().strftime("%A") + "' and event_name LIKE '" + EventInstance.objects.get(sport_id = event_id).event_name + "';"
+    query = "SELECT registration_id, event_date, event_name, username, first_name  FROM altFrontend_registration JOIN altFrontend_eventnstance ON event_id = event_id_id JOIN auth_user ON id = user_id_id WHERE event_date LIKE '"+ datetime.datetime.now().strftime("%A") + "' and event_name LIKE '" + EventInstance.objects.get(event_id = event_id).event_name + "';"
 
 
     '''for i in Registration.objects.all():
@@ -63,6 +63,14 @@ def homeView(request, *args, **kwargs):
         if event.event_date.day - datetime.datetime.now().day <= 1:
             upcomingevents.append(EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = event.schedule_id_id).template_id_id))
 
+    if  request.method == 'POST':
+        vent = EventInstance.objects.get(schedule_id_id = Schedule.objects.get(template_id_id = request.POST['templateID']).schedule_id)
+        newRegistration = Registration(
+            registration_date = datetime.datetime.now(),
+            event_id_id = vent.event_id,
+            user_id_id = request.POST['userID'],
+        )
+        newRegistration.save()
 
     context = {
         "Students" : [student for student in Student.objects.all()],

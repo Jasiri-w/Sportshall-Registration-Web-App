@@ -3,8 +3,8 @@
 {% block title %}Sheet View{% endblock title%}
 
 {% block headtext %}
-	<h2>{{ Event.sport_name }} List</h2>
-	<p>All students signed up for {{ Event.sport_name }}</p>
+	<h2>{{ Event.event_name }} List</h2>
+	<p>All students signed up for {{ Event.event_name }}</p>
 {% endblock headtext %}
 {% block column1%}
 	{% load tagextras %}
@@ -32,7 +32,7 @@
 				{{ form.as_p }}
 				<p>Max: {{ Event.maximum_capacity }}</p>
 				<input type="hidden" name="userID" value="{{ user.id  }}"></input>
-				<input type="hidden" name="sportID" value="{{ Event.sport_id }}"></input>
+				<input type="hidden" name="eventID" value="{{ Event.event_id }}"></input>
 				<input type="submit"  id="addButton" class="addBtn" value="Sign Up"></input>
 			</form>
 		</p>
