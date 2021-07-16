@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 def nextDay(date, day):
     days_ahead = day - date.weekday()
-    if days_ahead <= 0: # Target day already happened this week
+    if days_ahead < 0: # Target day already happened this week
         days_ahead += 7
     return date + timedelta(days_ahead)
 
@@ -30,8 +30,13 @@ def updateInstanceModel():
     # Second: Add all Schedule objects to EventInstance
     for event in ScheduleObjects:
         print("Next " + event.day + " : ", nextDay(datetime.now(),dayMatrix[event.day]))
-        newEvent = EventInstance(
-            event_date = nextDay(datetime.now(),dayMatrix[event.day]),
-            schedule_id_id = event.schedule_id,
-        )
-        newEvent.save()
+        if InstanceObjects.filter(schedule_id_id = event.schedule_id).exists() :
+            InstanceObjects.filter(schedule_id = event.schedule_id).update(
+                event_date = nextDay(datetime.now(),dayMatrix[event.day]),
+            )
+        else:
+            newEvent = EventInstance(
+                event_date = nextDay(datetime.now(),dayMatrix[event.day]),
+                schedule_id_id = event.schedule_id,
+            )
+            newEvent.save()

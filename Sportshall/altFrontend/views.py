@@ -54,11 +54,14 @@ def homeView(request, *args, **kwargs):
     
     updateInstanceModel()
 
-    allevents = EventInstance.objects.all()
+    InstanceObjects = EventInstance.objects.all()
+    TemplateObjects = EventTemplate.objects.all()
+    ScheduleObjects = Schedule.objects.all()
     upcomingevents = []
-    for event in allevents :
-        if event.event_date.strftime("%x") == datetime.datetime.now().strftime("%x"):
-            upcomingevents.append(event)
+    for event in InstanceObjects :
+        print(event.event_date.day - datetime.datetime.now().day)
+        if event.event_date.day - datetime.datetime.now().day <= 1:
+            upcomingevents.append(EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = event.schedule_id_id).template_id_id))
 
 
     context = {
@@ -155,7 +158,7 @@ def scheduleView(request, *args, **kwargs ):
         schedule[event.schedule_id] = event.__dict__
         schedule[event.schedule_id]['_state'] = None
     database_data['Schedule'] = schedule 
-    context['JSON'] = dumps(database_data)
+    context['JSON'] = dumps(database_data, default=str)
     print("Hello?")
     print(context['JSON'])
     return render(request, 'frontend/schedule.html', context)

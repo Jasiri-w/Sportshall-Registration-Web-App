@@ -44,11 +44,13 @@ Home
                         {%csrf_token%}
                         {{ form.as_p }}
                         <h3>{{ event.event_name }}</h3>
-                        <p>Capacity Placeholder</p>
+                        <p>Max: {{event.maximum_capacity}}</p>
+                        <p>{{event.gender}}</p>
+                        <p>Year {{event.year_group}}</p>
                         <input type="hidden" name="userID" value="{{ user.id  }}"></input>
                         <input type="hidden" name="sportID" value="{{ event.sport_id }}"></input>
                         <input type="submit"  id="addButton" class="addBtn" value="Sign Up"></input>
-                        <a href="/sheet/{{event.sport_id}}">View List > </a>
+                        <a href="/sheet/{{event.template_id}}">View List > </a>
                     </form>
                 </div>
             {% empty%}
