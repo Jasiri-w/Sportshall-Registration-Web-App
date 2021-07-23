@@ -41,6 +41,10 @@
 
     <div id="main">
         
+        {% if Message %}
+        <div id="messages" style="float:left;">{% block messages%}{{ message }}{% endblock messages%}</div>
+        {% endif%}
+
         <div id = "topbar" style="float: right;">
         {% block topbar %}
         

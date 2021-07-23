@@ -49,8 +49,9 @@ Home
                         <p>Year {{event.year_group}}</p>
                         <input type="hidden" name="userID" value="{{ user.id  }}"></input>
                         <input type="hidden" name="templateID" value="{{ event.template_id }}"></input>
+                        <input type="hidden" name="eventID" value="{{ event.event_id }}"></input>
                         <input type="submit"  id="addButton" class="addBtn" value="Sign Up"></input>
-                        <a href="/sheet/{{event.template_id}}">View List > </a>
+                        <a href="/sheet/{{event.event_id}}">View List > </a>
                     </form>
                 </div>
             {% empty%}

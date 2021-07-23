@@ -5,7 +5,9 @@
 {% block headtext %}
 	<h2>{{ Event.event_name }} List</h2>
 	<p>All students signed up for {{ Event.event_name }}</p>
+	<p id="message"></p>
 {% endblock headtext %}
+
 {% block column1%}
 	{% load tagextras %}
 
@@ -37,11 +39,11 @@
 			</form>
 		</p>
 	{% endif %}
-	{% comment %}{% for r in Registered%}
-		<p class='name' onclick='remove(this)' data-id="{{ r.registration_id }}"><em> " + u + ". " + names[i].name + " - " + names[i].bhouse + " - Year " + names[i].yeargroup + "</em></p>
-	{% endfor %}{%endcomment%}
+	{% for r in Registered%}
+		<!--<p class='name' onclick='remove(this)' data-id="{{ r.registration_id }}"><em> " + u + ". " + names[i].name + " - " + names[i].bhouse + " - Year " + names[i].yeargroup + "</em></p>-->
+	{% endfor %}
 	{% for r in Registered %}
-		<p class="">{{ r.registration_id }} - {{ r.first_name }} - {{ r.sport_name }}</p>
+		<!--<p class="">{{ r.registration_id }} - {{ r.first_name }} - {{ r.sport_name }}</p>-->
 	{% endfor %}
 {% endblock column1%}
 {% block scripts %}
@@ -62,36 +64,67 @@
 			gender: "{{ Student.gender }}"
 		});
 	}**/
-	var students = [];
-	{% for Student in Students %}
-		students.push({
-			id: {{ Student.student_id }},
-			firstname: "{{ Student.student_first_name }}",
-			lastname: "{{ Student.student_last_name }}",
-			bhouse: "{{ Student.boarding_house }}",
-			yeargroup: "{{ Student.year_group }}",
-			gender: "{{ Student.gender }}"
-		});
-	{% endfor %}
-	for(var i = 0; i < students.length; i++){
-		console.log(students[i]);
-	};
+
+	var data = JSON.parse("{{JSON|escapejs}}");
+
+	var EventData = data["Event"];
+	var RegisteredStudents = data["Registered"];
+	var Students = data["Students"];
+
+	console.log(data);
+
 	var names = [];//["Ronaldo" , "Messi" , "Ontario" , "Margaux" , "Jameson", "Mallard" , "Lingard" , "Jenkins" , "Caboose" , "Sarge" , "Agent Texas" , "Agent Washington" , "Agent Mane"];
+
 	var container = document.getElementById("container");
 	var form = document.getElementById('inputForm');
 	var input = document.getElementById('newNameInput');
 	var addbtn = document.getElementById('addButton');
 	var clearBtn = document.getElementById('clearbtn');
-	var nameElems = document.querySelectorAll('.name'); //These will be added dynamically so this wont make sense like this
+	//var nameElems = document.querySelectorAll('.name'); //These will be added dynamically so this wont make sense like this
 	
-	
-	displayNames(names);
+	window.onload = function() {
+		document.querySelector("#headtext h2").innerHTML = EventData["session"] + " " + EventData["event_name"] + " <br> Year " + EventData["year_group"] + " " + EventData["gender"] + "s ";
+		document.querySelector("#headtext p").innerHTML = "All students signed up for " + EventData["event_name"] + " on " + EventData["day"] + " " + EventData["event_date"];
+		for(var s in Students){	
+			document.querySelector("#names").innerHTML += "<option id = '" + Students[s]["student_id"] + "' value='" + Students[s]["student_first_name"] + " " + Students[s]["student_last_name"] + "''>";
+		}
+		DisplayStudents();
+	}
+
+	function DisplayStudents(){
+		
+		nameElems = document.querySelectorAll('.name');
+		
+		nameElems.forEach(function(a) {
+		  a.remove()
+		})
+		
+		var column1 = document.getElementById("column1");
+		var column2 = document.getElementById("column2");
+		var currentColumn = column1;
+		count = 0;
+		for(var Student in RegisteredStudents){
+			count++;
+			if(count-1 >= 20){
+			   break;
+			}
+			if(count-1 >= 10){
+				currentColumn = column2;
+			}
+			currentColumn.innerHTML += "<p class='name' onclick='remove(this)' id=" + RegisteredStudents[Student]['student_id'] + "><em>" + count + ". " + RegisteredStudents[Student]['student_first_name'] + " " + RegisteredStudents[Student]['student_last_name'] + " - " + RegisteredStudents[Student]['boarding_house'] + " - Year " + RegisteredStudents[Student]['year_group'] + "</em></p>";// 1. John
+		}
+
+		document.getElementById('newNameInput').focus();
+		
+	}
+
+	//displayNames(names);
 	
 	//calls add and render function also prevents default
 	function addCycle(e){
 		e.preventDefault();
 		addName();
-		displayNames();
+		DisplayStudents();
 	}
 	
 	addbtn.addEventListener("click", function(event) {
@@ -101,7 +134,7 @@
 		event.preventDefault();
 		//alert("submitted");
 		addName();
-		displayNames();
+		DisplayStudents();
 	});
 	
 	input.addEventListener("keyup", function(event) {
@@ -111,7 +144,7 @@
 			// Cancel the default action, if needed
 			event.preventDefault();
 			addName();
-			displayNames();
+			DisplayStudents();
 		}
 		event.preventDefault();
 	});
@@ -121,10 +154,10 @@
 		event.preventDefault();
 		console.log("Clearing");
 		clearAll();
-		displayNames();
+		DisplayStudents();
 	});
 	
-	//added names to array
+	//added names to array --DEPRACATED FUNCTION
 	function displayNames(nameList){
 		
 		nameElems = document.querySelectorAll('.name');
@@ -136,7 +169,7 @@
 		var column1 = document.getElementById("column1");
 		var column2 = document.getElementById("column2");
 		var currentColumn = column1;
-		for(var i = 0; i < names.length; i++){
+		for(var i = 0; i < Students.length; i++){
 			if(i >= 20){
 			   break;
 			}
@@ -144,7 +177,7 @@
 				currentColumn = column2;
 			}
 			var u = i+1;
-			currentColumn.innerHTML += "<p class='name' onclick='remove(this)' data-id=" + names[i].signupid + "><em>" + u + ". " + names[i].name + " - " + names[i].bhouse + " - Year " + names[i].yeargroup + "</em></p>";// 1. John
+			currentColumn.innerHTML += "<p class='name' onclick='remove(this)' data-id=" + Students[i].signupid + "><em>" + u + ". " + names[i].name + " - " + names[i].bhouse + " - Year " + names[i].yeargroup + "</em></p>";// 1. John
 		}
 
 		document.getElementById('newNameInput').focus();
@@ -153,19 +186,25 @@
 	
 	//adding names
 	function addName() {
-		var input = document.getElementById('newNameInput');
-		var buffer = input.value;
-		var newName = '';
-		for(var i = 0 ; i < students.length; i++){
-			if(buffer.toLowerCase() == students[i].firstname.toLowerCase()){
-				newName = students[i];
+		document.querySelector("#message").innerHTML = "";
+		var input = document.getElementById('newNameInput') ? document.getElementById('newNameInput') : "";
+		var buffer = input != "" ? input.value : "";
+		for(var s in Students){
+			teststr = Students[s]["student_first_name"] + " " + Students[s]["student_last_name"];
+			console.log(teststr);
+			if(buffer.toLowerCase() == teststr.toLowerCase()){
+				if(typeof RegisteredStudents[s] == "undefined"){
+					RegisteredStudents[s] = Students[s];
+				}else{
+					document.querySelector("#message").innerHTML = "<span style='color: red;'><em><strong>" + Students[s].student_first_name +"</strong> is already signed up</em><span>";
+				}
 			}
 		}
 		//console.log(newName);
 		
-		if(newName !== ''){
-		
-			const name = {
+		/**if(newName !== ''){
+			RegisteredStudents[newName.student_id] = newName;
+			/**const name = {
 				id : newName.id,
 				signupid : Date.now(),
 				name: newName.firstname + " " + newName.lastname,
@@ -173,10 +212,10 @@
 				yeargroup: newName.yeargroup,
 				gender: newName.gender
 				
-			};
-			names.push(name);
+			};**/
+			//names.push(name);
 			//console.log(names);
-		}
+		//}
 		input.value = '';
 		input.focus();
 		
@@ -186,15 +225,17 @@
 	function remove(el) {
 		//console.log(el.getAttribute("data-id"));
 
-		for(var i = 0; i < names.length; i++){
+		for(var r in RegisteredStudents){
 			//console.log(names[i].id);
-			if(names[i].signupid == el.getAttribute("data-id")){
+			if(RegisteredStudents[r].student_id == el.id){
 				//console.log(names[i].id);
-				names.splice(i,1);
+				//names.splice(i,1);
+
+				delete RegisteredStudents[r];
 				el.remove();
 				//console.log(names);
 				//console.log("Name removed.");
-				displayNames();
+				DisplayStudents();
 				return;
 			}
 		}
@@ -204,9 +245,13 @@
 
 	// clear all names
 	function clearAll(){
-		names = [];
-		displayNames();
+		RegisteredStudents = [];
+		displaysStudents();
 	}
 	
+	function revertToLastSave(){
+		RegisteredStudents = data["Registered"];
+	}
+
 </script>
 {% endblock scripts%}

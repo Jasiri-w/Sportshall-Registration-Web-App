@@ -30,21 +30,33 @@ def signUp(request, *args, **kwargs):
     }
     return render(request, 'frontend/home.html', context)
 
-def sheetView(request, event_id, *args, **kwargs):
-    #regset = Registration.objects.filter(sport_id = event_id)
-    query = "SELECT registration_id, event_date, event_name, username, first_name  FROM altFrontend_registration JOIN altFrontend_eventnstance ON event_id = event_id_id JOIN auth_user ON id = user_id_id WHERE event_date LIKE '"+ datetime.datetime.now().strftime("%A") + "' and event_name LIKE '" + EventInstance.objects.get(event_id = event_id).event_name + "';"
+def sheetView(request, event_id_id_id, *args, **kwargs):
+    #print("\n\nSheet view logic running")
 
-
-    '''for i in Registration.objects.all():
-        for j in Student
-            if event_id == i.sport_id:
-                current.append(Student.objects.)'''
+    RegQuery = f"SELECT registration_id, event_name, event_date, schedule_id, template_id, student_id, first_name, last_name, id, session, day, student_first_name, student_last_name, altFrontend_student.gender AS student_gender, altFrontend_student.year_group AS year_group, boarding_house, altFrontend_student.user_id_id FROM altFrontend_registration JOIN altFrontend_eventinstance ON event_id = event_id_id JOIN altFrontend_schedule ON schedule_id_id = schedule_id JOIN altFrontend_eventtemplate ON template_id = template_id_id JOIN auth_user ON auth_user.id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = altFrontend_registration.user_id_id WHERE event_id = { event_id_id_id };"
+    StudentQuery = f"SELECT * FROM altFrontend_student WHERE gender =  '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).gender }' AND year_group =  '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).year_group }' "
+    EventQuery = f"SELECT event_id, event_date, session, day, event_name, gender, maximum_capacity, year_group  FROM altFrontend_eventinstance JOIN altFrontend_schedule ON schedule_id = schedule_id_id JOIN altFrontend_eventtemplate ON template_id = template_id_id WHERE event_id = { event_id_id_id };"
+    
+    students = {}
+    for el in Student.objects.raw(str(StudentQuery)):
+        #print("El: ", el)
+        students[el.student_id] = el.__dict__
+        students[el.student_id]['_state'] = None
+        #print("students[el.students_id] ", students[el.student_id])
+    registered = {}
+    for el in Registration.objects.raw(str(RegQuery)):
+        registered[el.student_id] = el.__dict__
+        registered[el.student_id]['_state'] = None
 
     context = {
-        "Students" : [student for student in Student.objects.all()],
-        "Event" : EventInstance.objects.get(event_id = event_id),
-        "Registered" : [reg for reg in Registration.objects.raw(query)]
+        "Event" : EventInstance.objects.raw(EventQuery)[0].__dict__,
+        "Students" : students,
+        "Registered" : registered
     }
+    context["Event"]['_state'] = None
+    context["Event"]['event_date'] = context["Event"]['event_date'].strftime("%x")
+    context["JSON"] = dumps(context, default=str)
+
     return render(request, 'frontend/sheet.html', context)
 
 ##########################################################################################################################################
@@ -58,19 +70,29 @@ def homeView(request, *args, **kwargs):
     TemplateObjects = EventTemplate.objects.all()
     ScheduleObjects = Schedule.objects.all()
     upcomingevents = []
-    for event in InstanceObjects :
+    context = {}
+    querySet = EventInstance.objects.raw("select event_id, schedule_id_id, session, day, template_id, event_name, gender, year_group, maximum_capacity from altFrontend_eventinstance join altFrontend_schedule on altFrontend_schedule.schedule_id = altFrontend_eventinstance.schedule_id_id join altFrontend_eventtemplate on altFrontend_eventtemplate.template_id = altFrontend_schedule.template_id_id;")
+    for event in querySet :
         print(event.event_date.day - datetime.datetime.now().day)
         if event.event_date.day - datetime.datetime.now().day <= 1:
-            upcomingevents.append(EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = event.schedule_id_id).template_id_id))
+            upcomingevents.append(event)
+
+    '''for event in EventTemplate.objects.all():
+        upcomingevents[event.event_id] = event.__dict__
+        upcomingevents[event.event_id]['_state'] = None'''
 
     if  request.method == 'POST':
-        vent = EventInstance.objects.get(schedule_id_id = Schedule.objects.get(template_id_id = request.POST['templateID']).schedule_id)
-        newRegistration = Registration(
-            registration_date = datetime.datetime.now(),
-            event_id_id = vent.event_id,
-            user_id_id = request.POST['userID'],
-        )
-        newRegistration.save()
+        if not Registration.objects.filter(event_id = request.POST['eventID']).filter(user_id = request.POST['userID']).exists():
+            vent = EventInstance.objects.get(event_id = request.POST['eventID'])
+            newRegistration = Registration(
+                registration_date = datetime.datetime.now(),
+                event_id_id = vent.event_id,
+                user_id_id = request.POST['userID'],
+            )
+            newRegistration.save()
+        else:
+            context["Message"] = "<span style='color: red;'><em>You are already signed up for this activity<em></span>"
+
 
     context = {
         "Students" : [student for student in Student.objects.all()],
@@ -110,8 +132,8 @@ def scheduleView(request, *args, **kwargs ):
         eventInstances[event.event_id]['_state'] = None
     registrations = {}
     for reg in Registration.objects.all():
-        registrations[reg.name] = reg.__dict__
-        registrations[reg.name]['_state'] = None
+        registrations[reg.registration_id] = reg.__dict__
+        registrations[reg.registration_id]['_state'] = None
 
     context = {}
     database_data = {
