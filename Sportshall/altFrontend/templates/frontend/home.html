@@ -39,7 +39,7 @@ Home
         <h2 class="rowTitle">Upcoming Events</h2>
         <div class="eventBlockContainer">
             {% for event in UpcomingEvents %}
-                <div class="eventBlock">
+                <div class="eventBlock" id="{{ event.event_id }}">
                     <form action="" method="post" onSubmit="" id="signUpForm">
                         {%csrf_token%}
                         {{ form.as_p }}
@@ -47,9 +47,9 @@ Home
                         <p>Max: {{event.maximum_capacity}}</p>
                         <p>{{event.gender}}</p>
                         <p>Year {{event.year_group}}</p>
-                        <input type="hidden" name="userID" value="{{ user.id  }}"></input>
-                        <input type="hidden" name="templateID" value="{{ event.template_id }}"></input>
-                        <input type="hidden" name="eventID" value="{{ event.event_id }}"></input>
+                        <input type="hidden" id="userID" name="userID" value="{{ user.id  }}"></input>
+                        <input type="hidden" id="templateID" name="templateID" value="{{ event.template_id }}"></input>
+                        <input type="hidden" id="eventID" name="eventID" value="{{ event.event_id }}"></input>
                         <input type="submit"  id="addButton" class="addBtn" value="Sign Up"></input>
                         <a href="/sheet/{{event.event_id}}">View List > </a>
                     </form>
@@ -74,3 +74,31 @@ Home
 <h1>Home</h1>
 <p>Sign up for Today's Activities</p>
 {% endblock headtext %}
+
+{% block scripts %}
+<script>
+var data = JSON.parse("{{JSON|escapejs}}");
+var UserEvents = data["UserEvents"];
+var UpcomingEvents = data["UpcomingEventsDict"];
+
+console.table(data);
+
+for(var ev in UserEvents){
+    console.log(ev);
+}
+
+for(var x in UpcomingEvents){
+    for(var y in UserEvents){
+        if(UserEvents[y].event_id_id == UpcomingEvents[x].event_id){
+            var el = document.getElementById(UpcomingEvents[x].event_id);
+            for(var i =0; i < el.children[0].children.length;i++){
+                if(el.children[0].children[i].id == "addButton"){
+                    el.children[0].children[i].remove();
+                }
+            }
+        }
+    }
+}
+
+</script>
+{% endblock %}

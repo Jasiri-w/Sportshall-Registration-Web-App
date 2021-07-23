@@ -83,7 +83,7 @@
 	//var nameElems = document.querySelectorAll('.name'); //These will be added dynamically so this wont make sense like this
 	
 	window.onload = function() {
-		document.querySelector("#headtext h2").innerHTML = EventData["session"] + " " + EventData["event_name"] + " <br> Year " + EventData["year_group"] + " " + EventData["gender"] + "s ";
+		document.querySelector("#headtext h2").innerHTML = EventData["day"] + " " +EventData["session"] + " " + EventData["event_name"] + " <br> Year " + EventData["year_group"] + " " + EventData["gender"] + "s ";
 		document.querySelector("#headtext p").innerHTML = "All students signed up for " + EventData["event_name"] + " on " + EventData["day"] + " " + EventData["event_date"];
 		for(var s in Students){	
 			document.querySelector("#names").innerHTML += "<option id = '" + Students[s]["student_id"] + "' value='" + Students[s]["student_first_name"] + " " + Students[s]["student_last_name"] + "''>";

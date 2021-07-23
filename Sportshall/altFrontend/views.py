@@ -11,6 +11,16 @@ from json import dumps, loads
 
 from django.core.files.storage import FileSystemStorage
 
+def dictify(object_arg, key):
+    newDict= {}
+
+    for el in object_arg:
+        newDict[el.key] = el.__dict__
+        newDict[el.key]['_state'] = None
+
+    return newDict
+
+
 # Create your views here.
 def dummyView(request, *args, **kwargs):
     pass
@@ -62,26 +72,32 @@ def sheetView(request, event_id_id_id, *args, **kwargs):
 ##########################################################################################################################################
 
 def homeView(request, *args, **kwargs):
-    #currentevents = EventInstance.objects.filter(event_date=datetime.datetime.now().strftime("%A"))
     
     updateInstanceModel()
 
-    InstanceObjects = EventInstance.objects.all()
-    TemplateObjects = EventTemplate.objects.all()
-    ScheduleObjects = Schedule.objects.all()
-    upcomingevents = []
+    # All the values/parameters/variables passed to the html through Django's rendering function: a dict of data passed to the frontend
     context = {}
+
+    # Upcoming events such as tonights basketball or tommorrow mornings squash
+    upcomingevents = []
     querySet = EventInstance.objects.raw("select event_id, schedule_id_id, session, day, template_id, event_name, gender, year_group, maximum_capacity from altFrontend_eventinstance join altFrontend_schedule on altFrontend_schedule.schedule_id = altFrontend_eventinstance.schedule_id_id join altFrontend_eventtemplate on altFrontend_eventtemplate.template_id = altFrontend_schedule.template_id_id;")
     for event in querySet :
-        print(event.event_date.day - datetime.datetime.now().day)
+        #print(event.event_date.day - datetime.datetime.now().day)
         if event.event_date.day - datetime.datetime.now().day <= 1:
             upcomingevents.append(event)
 
-    '''for event in EventTemplate.objects.all():
-        upcomingevents[event.event_id] = event.__dict__
-        upcomingevents[event.event_id]['_state'] = None'''
-
+    # Queries the Registration table for the current users registrations: all the events the user is signed up for    
+    userEvents = {}
+    userEventsQuery = f"SELECT registration_id, event_id_id, registration_date, student_first_name, student_last_name, boarding_house, year_group, gender, altFrontend_student.user_id_id FROM altFrontend_registration JOIN auth_user ON id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = id WHERE altFrontend_student.user_id_id = { request.user.id };"
+    userEventsQuerySet = Registration.objects.raw(userEventsQuery)
+    for event in userEventsQuerySet:
+        userEvents[event.registration_id] = event.__dict__
+        userEvents[event.registration_id]["_state"] = None
+        
+    print("\nUser Events: ", userEvents)
+    # When the user clicks sign up or any other request/form submission is sent from "home.html" 
     if  request.method == 'POST':
+        # Checks to see if a Registration table entry already exists with both the specific event ( which changes every new time the event comes) and linked to the user
         if not Registration.objects.filter(event_id = request.POST['eventID']).filter(user_id = request.POST['userID']).exists():
             vent = EventInstance.objects.get(event_id = request.POST['eventID'])
             newRegistration = Registration(
@@ -91,15 +107,29 @@ def homeView(request, *args, **kwargs):
             )
             newRegistration.save()
         else:
+            # If the user is already registered write this at the top of the page
             context["Message"] = "<span style='color: red;'><em>You are already signed up for this activity<em></span>"
 
-
     context = {
-        "Students" : [student for student in Student.objects.all()],
-        "Registrations" : [reg for reg in Registration.objects.all()],
+        #"Students" : [student for student in Student.objects.all()], Until we decide wether we want to show whos signed up for what
+        #"Registrations" : [reg for reg in Registration.objects.all()],
         "UpcomingEvents" : upcomingevents,
+        "UserEvents" : userEvents,
+        "UpcomingEventsDict" : {},
         "AllEvents" : EventTemplate.objects.all()
     }
+
+    # In order for these elements to be JSONifiable they must be converted to dicts
+    for event in upcomingevents:
+        context["UpcomingEventsDict"][event.event_id] = event.__dict__
+        context["UpcomingEventsDict"][event.event_id]["_state"] = None
+    
+    print("\nContext: ", context)
+    context["JSON"] = dumps(context, default=str)
+    print("\nContext: ", context)
+    
+
+
     return render(request, 'frontend/home.html', context)
 
 def addEventToSchedule(request, *args, **kwargs ):
