@@ -16,7 +16,7 @@
 			<form action="/addName/" method="post" onSubmit="return addCycle(event)" id="inputForm">
 				{% csrf_token %}
 				<!--<input type="text" id="newNameInput" value=""></input>-->
-				<input list="names" name="newNameInput" id="newNameInput" value=""/>
+				<input list="names" name="newNameInput" id="newNameInput" value="" autocomplete="off"/>
 				<datalist id="names">
 					{% for Student in Students %}
 						<option value={{ Student.student_first_name }}>

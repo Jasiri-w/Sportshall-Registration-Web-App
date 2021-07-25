@@ -29,7 +29,7 @@ def updateInstanceModel():
 
     # Second: Add all Schedule objects to EventInstance
     for event in ScheduleObjects:
-        print("Next " + event.day + " : ", nextDay(datetime.now(),dayMatrix[event.day]))
+        #print("Next " + event.day + " : ", nextDay(datetime.now(),dayMatrix[event.day]))
         if InstanceObjects.filter(schedule_id_id = event.schedule_id).exists() :
             InstanceObjects.filter(schedule_id = event.schedule_id).update(
                 event_date = nextDay(datetime.now(),dayMatrix[event.day]),

@@ -46,7 +46,6 @@ def sheetView(request, event_id_id_id, *args, **kwargs):
     RegQuery = f"SELECT registration_id, event_name, event_date, schedule_id, template_id, student_id, first_name, last_name, id, session, day, student_first_name, student_last_name, altFrontend_student.gender AS student_gender, altFrontend_student.year_group AS year_group, boarding_house, altFrontend_student.user_id_id FROM altFrontend_registration JOIN altFrontend_eventinstance ON event_id = event_id_id JOIN altFrontend_schedule ON schedule_id_id = schedule_id JOIN altFrontend_eventtemplate ON template_id = template_id_id JOIN auth_user ON auth_user.id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = altFrontend_registration.user_id_id WHERE event_id = { event_id_id_id };"
     StudentQuery = f"SELECT * FROM altFrontend_student WHERE gender =  '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).gender }' AND year_group =  '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).year_group }' "
     EventQuery = f"SELECT event_id, event_date, session, day, event_name, gender, maximum_capacity, year_group  FROM altFrontend_eventinstance JOIN altFrontend_schedule ON schedule_id = schedule_id_id JOIN altFrontend_eventtemplate ON template_id = template_id_id WHERE event_id = { event_id_id_id };"
-    
     students = {}
     for el in Student.objects.raw(str(StudentQuery)):
         #print("El: ", el)
@@ -86,15 +85,15 @@ def homeView(request, *args, **kwargs):
         if event.event_date.day - datetime.datetime.now().day <= 1:
             upcomingevents.append(event)
 
-    # Queries the Registration table for the current users registrations: all the events the user is signed up for    
+    # Queries the Registration table for the current users registrations: all the events the user is signed up for 
     userEvents = {}
-    userEventsQuery = f"SELECT registration_id, event_id_id, registration_date, student_first_name, student_last_name, boarding_house, year_group, gender, altFrontend_student.user_id_id FROM altFrontend_registration JOIN auth_user ON id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = id WHERE altFrontend_student.user_id_id = { request.user.id };"
-    userEventsQuerySet = Registration.objects.raw(userEventsQuery)
-    for event in userEventsQuerySet:
-        userEvents[event.registration_id] = event.__dict__
-        userEvents[event.registration_id]["_state"] = None
-        
-    print("\nUser Events: ", userEvents)
+    if not request.user.id == None:
+        userEventsQuery = f"SELECT registration_id, event_id_id, registration_date, student_first_name, student_last_name, boarding_house, year_group, gender, altFrontend_student.user_id_id FROM altFrontend_registration JOIN auth_user ON id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = id WHERE altFrontend_student.user_id_id = { request.user.id };"
+        userEventsQuerySet = Registration.objects.raw(userEventsQuery)
+        for event in userEventsQuerySet:
+            userEvents[event.registration_id] = event.__dict__
+            userEvents[event.registration_id]["_state"] = None
+    
     # When the user clicks sign up or any other request/form submission is sent from "home.html" 
     if  request.method == 'POST':
         # Checks to see if a Registration table entry already exists with both the specific event ( which changes every new time the event comes) and linked to the user
@@ -123,12 +122,8 @@ def homeView(request, *args, **kwargs):
     for event in upcomingevents:
         context["UpcomingEventsDict"][event.event_id] = event.__dict__
         context["UpcomingEventsDict"][event.event_id]["_state"] = None
-    
-    print("\nContext: ", context)
-    context["JSON"] = dumps(context, default=str)
-    print("\nContext: ", context)
-    
 
+    context["JSON"] = dumps(context, default=str)
 
     return render(request, 'frontend/home.html', context)
 

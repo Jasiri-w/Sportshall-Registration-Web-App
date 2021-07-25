@@ -15,8 +15,8 @@ Home
 {% load tagextras %}
 {% if user|has_group:"Teacher" or user.is_superuser %}
     <section>
-        <h2>Activities<h4><em> ~ Add an activity to today's schedule</em></h4></h2>
-        <div class="eventBlockContainer">
+        <h2>Add Activities<i class="arrow toggle-arrow"></i><h4><em> ~ Add an activity to today's schedule</em></h4></h2>
+        <div class="eventBlockContainer" id="teacherBlock">
             {%for event in AllEvents%}
                 <div class="eventBlock teacher">
                     <h3>{{event.event_name}}</h3>
@@ -35,7 +35,7 @@ Home
 
 {% if user.is_authenticated %}
 
-    <section class="row" id="row1">
+    <!--<section class="row" id="row1">
         <h2 class="rowTitle">Upcoming Events</h2>
         <div class="eventBlockContainer">
             {% for event in UpcomingEvents %}
@@ -64,7 +64,7 @@ Home
         <div class="eventBlockContainer">
             
         </div>
-    </section>
+    </section>-->
 {% else %}
     <p>Login to see activities for tonite</p>
 {%endif%}
@@ -80,17 +80,33 @@ Home
 var data = JSON.parse("{{JSON|escapejs}}");
 var UserEvents = data["UserEvents"];
 var UpcomingEvents = data["UpcomingEventsDict"];
-
+/**var csrftoken = "{% csrf_token %}";
+console.log("{% csrf_token %}");
+console.log(csrftoken);
+**/
 console.table(data);
 
 for(var ev in UserEvents){
     console.log(ev);
 }
 
+var rows = []
+var count = 0
+for(var ev in UpcomingEvents){
+    var event = UpcomingEvents[ev];
+    var rowname = event.day + " " + event.session
+    if(!rows.includes(rowname)){
+        count++;
+        rows.push(rowname);
+        document.querySelector("#container2").innerHTML += '<section class="row" id="' + event.day + '-' + event.session + '"><h2 class="RowTitle">' + rowname + ' Activities</h2><div class="eventBlockContainer"></div></section>'
+    }
+}
+
 for(var x in UpcomingEvents){
     for(var y in UserEvents){
         if(UserEvents[y].event_id_id == UpcomingEvents[x].event_id){
             var el = document.getElementById(UpcomingEvents[x].event_id);
+            el.style.borderColor = "green";
             for(var i =0; i < el.children[0].children.length;i++){
                 if(el.children[0].children[i].id == "addButton"){
                     el.children[0].children[i].remove();
@@ -99,6 +115,38 @@ for(var x in UpcomingEvents){
         }
     }
 }
+
+for(var x in UpcomingEvents){
+    var event = UpcomingEvents[x];
+    var query = "#" + event.day + "-" + event.session + " .eventBlockContainer";
+    var el = document.querySelector(query);
+    el.innerHTML +='<div class="eventBlock" id="' + event.event_id + '"><form action="" method="post" onsubmit="" id="signUpForm">{% csrf_token %}<h3>' + event.event_name + '</h3><p>Max: ' + event.maximum_capacity + '</p><p>' + event.gender + '</p><p>Year ' + event.year_group + '</p><input type="hidden" id="userID" name="userID" value="'+ {{ user.id }} +'"><input type="hidden" id="templateID" name="templateID" value="' + event.template_id + '"><input type="hidden" id="eventID" name="eventID" value="' + event.event_id + '"><input type="submit" id="addButton" class="addBtn" value="Sign Up"><a href="/sheet/' + event.event_id + '">View List &gt; </a></form></div>'
+}
+
+Array.from(document.getElementsByClassName("toggle-arrow")).forEach(element => element.addEventListener('click', function (event) {
+    event.preventDefault();
+    var content = document.getElementById("teacherBlock");
+
+    if(!content.classList.contains('toggled')){
+        content.classList.add('toggled');
+        content.style.height = 'auto';
+
+        element.classList.add("rotated-180");
+
+        var height = content.clientHeight + "px";
+        content.style.height = '0px';
+
+        setTimeout(function () {
+            content.style.height = height;
+        }, 0); 
+    }else{
+        content.style.height = '0px';
+
+        element.classList.remove("rotated-180");
+        content.classList.remove('toggled');
+
+    }
+}));
 
 </script>
 {% endblock %}
