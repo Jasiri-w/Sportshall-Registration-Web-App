@@ -102,19 +102,8 @@ for(var ev in UpcomingEvents){
     }
 }
 
-for(var x in UpcomingEvents){
-    for(var y in UserEvents){
-        if(UserEvents[y].event_id_id == UpcomingEvents[x].event_id){
-            var el = document.getElementById(UpcomingEvents[x].event_id);
-            el.style.borderColor = "green";
-            for(var i =0; i < el.children[0].children.length;i++){
-                if(el.children[0].children[i].id == "addButton"){
-                    el.children[0].children[i].remove();
-                }
-            }
-        }
-    }
-}
+
+
 
 for(var x in UpcomingEvents){
     var event = UpcomingEvents[x];
@@ -147,6 +136,21 @@ Array.from(document.getElementsByClassName("toggle-arrow")).forEach(element => e
 
     }
 }));
+
+for(var x in UpcomingEvents){
+    for(var y in UserEvents){
+        if(UserEvents[y].event_id_id == UpcomingEvents[x].event_id){
+            var el = document.getElementById(UpcomingEvents[x].event_id);
+            //el.style.borderColor = "green";
+            for(var i =0; i < el.children[0].children.length;i++){
+                if(el.children[0].children[i].id == "addButton"){
+                    el.children[0].children[i].remove();
+                }
+            }
+        }
+    }
+}
+
 
 </script>
 {% endblock %}

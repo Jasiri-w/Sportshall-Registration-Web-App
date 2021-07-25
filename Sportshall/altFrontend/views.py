@@ -79,7 +79,8 @@ def homeView(request, *args, **kwargs):
 
     # Upcoming events such as tonights basketball or tommorrow mornings squash
     upcomingevents = []
-    querySet = EventInstance.objects.raw("select event_id, schedule_id_id, session, day, template_id, event_name, gender, year_group, maximum_capacity from altFrontend_eventinstance join altFrontend_schedule on altFrontend_schedule.schedule_id = altFrontend_eventinstance.schedule_id_id join altFrontend_eventtemplate on altFrontend_eventtemplate.template_id = altFrontend_schedule.template_id_id;")
+    equery = f"select event_id, schedule_id_id, session, day, template_id, event_name, gender, year_group, maximum_capacity from altFrontend_eventinstance join altFrontend_schedule on altFrontend_schedule.schedule_id = altFrontend_eventinstance.schedule_id_id join altFrontend_eventtemplate on altFrontend_eventtemplate.template_id = altFrontend_schedule.template_id_id where gender = '{ Student.objects.get(user_id_id = request.user.id).gender }' and year_group = { Student.objects.get(user_id_id = request.user.id).year_group } ;" if request.user != None else "select event_id, schedule_id_id, session, day, template_id, event_name, gender, year_group, maximum_capacity from altFrontend_eventinstance join altFrontend_schedule on altFrontend_schedule.schedule_id = altFrontend_eventinstance.schedule_id_id join altFrontend_eventtemplate on altFrontend_eventtemplate.template_id = altFrontend_schedule.template_id_id;"
+    querySet = EventInstance.objects.raw(equery)
     for event in querySet :
         #print(event.event_date.day - datetime.datetime.now().day)
         if event.event_date.day - datetime.datetime.now().day <= 1:

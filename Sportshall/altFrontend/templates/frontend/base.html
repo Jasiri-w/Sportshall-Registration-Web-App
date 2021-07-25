@@ -63,13 +63,13 @@
         {% block main%}
             <div id="head">
             {%block head%}
+                <span class="sidenav-open-btn" style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; menu</span>
                 <section id = "headtext">
                     {% block headtext %}
                         <h2>Sportshall Sign-Up</h2>
                         <p>Sportshall activity registration web application</p>
                     {% endblock headtext %}    
                 </section>
-                <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; menu</span>
             {% endblock head%}
             </div>
 		<div id="container">
@@ -95,6 +95,7 @@
         {% endblock main %}
 	</div>
     <script src="{% static "js/sidebar.js " %}"></script>
+    <script src="{% static "js/main.js " %}"></script>
     {% block scripts%}
     {% endblock scripts%}
 </body>
