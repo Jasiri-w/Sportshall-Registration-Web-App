@@ -18,6 +18,9 @@
 </head>
 <body>
     {% load tagextras %}
+    {% if user.is_authenticated %}
+        <button id="back-btn" onclick="goBack()"><i class="arrow back-arrow"></i></button>
+    {% endif %}
     <div id="sidebar" class="sidenav">
         {% block sidebar %}
 		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>

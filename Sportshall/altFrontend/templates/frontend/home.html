@@ -72,7 +72,7 @@ Home
 
 {% block headtext %}
 <h1>Home</h1>
-<p>Sign up for Today's Activities</p>
+<!--<p>Sign up for Today's Activities</p>-->
 {% endblock headtext %}
 
 {% block scripts %}
@@ -109,7 +109,7 @@ for(var x in UpcomingEvents){
     var event = UpcomingEvents[x];
     var query = "#" + event.day + "-" + event.session + " .eventBlockContainer";
     var el = document.querySelector(query);
-    el.innerHTML +='<div class="eventBlock" id="' + event.event_id + '"><form action="" method="post" onsubmit="" id="signUpForm">{% csrf_token %}<h3>' + event.event_name + '</h3><p>Max: ' + event.maximum_capacity + '</p><p>' + event.gender + '</p><p>Year ' + event.year_group + '</p><input type="hidden" id="userID" name="userID" value="'+ {{ user.id }} +'"><input type="hidden" id="templateID" name="templateID" value="' + event.template_id + '"><input type="hidden" id="eventID" name="eventID" value="' + event.event_id + '"><input type="submit" id="addButton" class="addBtn" value="Sign Up"><a href="/sheet/' + event.event_id + '">View List &gt; </a></form></div>'
+    el.innerHTML +='<div class="eventBlock" id="' + event.event_id + '"><form action="" method="post" onsubmit="" id="signUpForm">{% csrf_token %}<h3>' + event.event_name + '</h3><p>Max: ' + event.maximum_capacity + '</p><p>' + event.gender + '</p><p>Year ' + event.year_group + '</p><input type="hidden" id="userID" name="userID" value="'+ {{ user.id }} +'"><input type="hidden" id="templateID" name="templateID" value="' + event.template_id + '"><input type="hidden" id="eventID" name="eventID" value="' + event.event_id + '"><input type="submit" id="addButton" class="addBtn" value="Sign Up"><a href="/sheet/' + event.event_id + '" class="view-list">View List &gt; </a></form></div>'
 }
 
 Array.from(document.getElementsByClassName("toggle-arrow")).forEach(element => element.addEventListener('click', function (event) {

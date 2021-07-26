@@ -5,7 +5,7 @@
 	font-size: 16px;
 	
 	--bg-color-1: white;
-	--bg-color-2: #333;
+	--bg-color-2: rgb(39, 27, 54);
 	--bg-color-3: ;
 	--font-1: black;
 	--font-2: black;
@@ -20,7 +20,7 @@ html, body{
 	max-height: 100%;
 	color: var(--font-color-main);
 	background-color: var(--bg-color-1);
-	margin: 0 35px;
+	
 	/**background: linear-gradient(to bottom right, #00ba7f, #c471ed, #f64f59);
 	background-size: 400% 400%;
 	-webkit-animation: backgroundRotation 0s ease infinite;
@@ -30,6 +30,7 @@ html, body{
 
 body{
 	opacity: 0;
+	margin:0;
 }
 
 h1 {
@@ -41,7 +42,23 @@ h2, h3, h4 {
 }
 a {
 	text-decoration: none;
-	color: var(--font-2);
+	color: rgb(54, 173, 54);
+	transition: padding-right 0.5s ease-in-out;
+}
+a:hover {
+	cursor: pointer;
+	padding-right: 0.6rem;
+}
+a:visited {
+	color: hotpink;
+}
+
+.view-list{
+	transition: padding-left 0.5s ease-in-out;
+}
+.view-list:hover {
+	cursor: pointer;
+	padding-left: 0.6rem;
 }
 
 #title{
@@ -52,8 +69,23 @@ a {
 	animation: fadeIn 1s ease-in 0.7s forwards /*,slideIn 0.8s ease-in 0.9s forwards*/;
 }
 
+.unloaded {
+	animation: fadeOut 1s ease-in 0.7s backwards /*,slideIn 0.8s ease-in 0.9s forwards*/;
+	opacity: 0;
+}
+
  
 @keyframes fadeIn {
+	60% {
+	  opacity: 0;
+	}
+	
+	100% {
+		opacity: 1;
+	}
+}
+ 
+@keyframes fadeOut {
 	60% {
 	  opacity: 0;
 	}
@@ -75,6 +107,27 @@ a {
 	h3 { font-size: 2rem; }
 	h4 { font-size: 1.5rem; }
 	h5 { font-size: 1rem; }*/
+}
+
+/* width */
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: rgba(0,0,0,0); 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: #888; 
+	border-radius: 15px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #555; 
 }
 
 @-webkit-keyframes backgroundRotation {
@@ -99,13 +152,40 @@ a {
 	display: inline-block;
 	padding: 3px ;
 	margin: 5px;
-	transform: rotate(45deg);
-	-webkit-transform: rotate(45deg);
 	transition: .5s ease;
 }
 .arrow:hover{
-
 	cursor: pointer;
+}
+
+.toggle-arrow{
+	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+}
+
+.back-arrow{
+	border-width: 0 1px 1px 0;
+	transform: rotate(135deg);
+	-webkit-transform: rotate(135deg);
+}
+
+#back-btn{
+	border: none;
+	position:relative;
+	background-color: #eee;
+	padding: 1rem;
+	font-size: 1rem;
+	transition: .4s ease-in-out;
+	margin: 0;
+}
+
+#back-btn:hover .back-arrow {
+	/*position:absolute;
+	left: 4px;*/
+}
+#back-btn:hover {
+	padding-left: 0.5rem;
+	cursor:pointer;
 }
 
 .rotated-180 {
@@ -115,13 +195,14 @@ a {
 
 #main{
 	height:100%;
+	margin: 0 5.2rem;
 	transition: margin-left .5s;
 	padding: 16px;
 }
 
 
 .sidenav-open-btn:hover{
-	transition: padding-left 0.4s ease;
+	transition: padding-left 0.4s ease-in-out;
 }
 .sidenav-open-btn:hover{
 	padding-left: 8px;
@@ -215,10 +296,15 @@ a {
 
 .eventBlock{
 	box-sizing: border-box;
-	border: 4px solid black;
+	/*border: 4px solid black;*/
 	padding: 12px;
 	margin: 0 10px;
 	min-width: 13rem;
+	transition: padding-left 0.4s ease-in-out, padding-right 0.4s ease-in-out ;
+}
+.eventBlock:hover{
+	padding-left: 6px;
+	padding-right: 18px;
 }
 
 #teacherBlock {
