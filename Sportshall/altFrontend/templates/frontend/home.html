@@ -13,6 +13,14 @@ Home
 {% endblock %}
 {%block container2%}
 {% load tagextras %}
+
+<section id="userEvents" style="display: none;" class="row">
+    <h2>Your Activities</h2>
+    <h4><em> ~ Activities you are signed up for</em></h4>
+    <div id="userEventBlock">
+
+    </duv>
+</section>
 {% if user|has_group:"Teacher" or user.is_superuser %}
     <section>
         <h2>Add Activities<i class="arrow toggle-arrow"></i><h4><em> ~ Add an activity to today's schedule</em></h4></h2>
@@ -151,6 +159,23 @@ for(var x in UpcomingEvents){
     }
 }
 
+function scrollTowards(query){
+    var scrollHeight = document.getElementById(query).parentElement.parentElement.offsetTop;
+    document.getElementById(query).focus();
+    window.scrollTo({
+        top: scrollHeight,
+        behavior: 'smooth'
+    });
+}
+
+if(Object.keys(UserEvents).length != 0 ) {
+    document.getElementById("userEvents").style.display = "block";
+    keys = Object.keys(UserEvents);
+    for(var i =0; i < Object.keys(UserEvents).length; i++){
+        var naming =  UpcomingEvents[UserEvents[keys[i]].event_id_id].event_name + " <span style='font-weight: 300;'>" + UpcomingEvents[UserEvents[keys[i]].event_id_id].day + " " + UpcomingEvents[UserEvents[keys[i]].event_id_id].session + "</span>";
+    document.getElementById("userEventBlock").innerHTML += '<div class="user-event" onclick="scrollTowards(' + UserEvents[keys[i]].event_id_id + ')"><h3 class=""><em>' + naming + '</em></h3></div>';
+    }
+}
 
 </script>
 {% endblock %}

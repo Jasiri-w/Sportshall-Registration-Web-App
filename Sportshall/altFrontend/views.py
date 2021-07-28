@@ -25,23 +25,69 @@ def dictify(object_arg, key):
 def dummyView(request, *args, **kwargs):
     pass
 
-def signUp(request, *args, **kwargs):
-    newRegistration = Registration(
-        registration_date = datetime.datetime.now(),
-        event_id_id = request.POST['eventID'],
-        user_id_id = request.POST['userID'],
-    )
-    newRegistration.save()
-
-    context = {
-        "Students" : [student for student in Student.objects.all()],
-        "Events" : [event for event in EventInstance.objects.all()],
-        "Registrations" : [reg for reg in Registration.objects.all()],
+def signUp(request):
+    status = {
+        "Status" : False,
+        "Message" : "",
     }
-    return render(request, 'frontend/home.html', context)
+    # If the user is already signed up
+    if not Registration.objects.filter(event_id = request.POST['eventID']).filter(user_id = request.user.id).exists():
+        vent = EventInstance.objects.get(event_id = request.POST['eventID'])
+        newRegistration = Registration(
+            registration_date = datetime.datetime.now(),
+            event_id_id = vent.event_id,
+            user_id_id = request.user.id,
+        )
+        newRegistration.save()
+        status["Status"] = True
+        status["Message"] = "<span style='color: green;'><em>Signed-Up Succesfully!</em></span>"
+    else:
+        # If the user is already registered write this at the top of the page
+        status["Message"] = "<span style='color: red;'><em>You are already signed up for this activity</em></span>"
+
+    return status
 
 def sheetView(request, event_id_id_id, *args, **kwargs):
     #print("\n\nSheet view logic running")
+
+    context = {}
+    response = {} 
+    if request.method == "POST":
+        # sign-up
+        if request.POST["postIntent"] == "Sign-Up":
+            response = signUp(request)
+
+        # save list and register students
+        elif request.POST["postIntent"] == "Save-List":
+            data = loads(request.POST["listData"])
+            for reg in data:
+                if("registration_id" in data[reg]):
+                    print(Student.objects.get(user_id_id = data[reg]["user_id_id"]).student_first_name, " is already signed up!")
+                    continue
+                
+                for x in Registration.objects.filter(event_id_id = request.POST["eventID"]):
+                    if data[reg]["user_id_id"] == x.user_id_id:
+                        print(Student.objects.get(user_id_id = data[reg]["user_id_id"]).student_first_name, " is already signed up!")
+                        continue
+                
+                oldRegisteredUsers = [y.user_id_id for y in Registration.objects.filter(event_id_id = request.POST["eventID"])]
+                             
+                event = EventInstance.objects.get(event_id = request.POST['eventID'])
+                newRegistration = Registration(
+                    registration_date = datetime.datetime.now(),
+                    event_id_id = event.event_id,
+                    user_id_id = data[reg]["user_id_id"],
+                )
+                newRegistration.save()
+                response["Message"] = "<span style='color: green;'><em>Everyone was Signed-Up Succesfully!</em></span>"
+                print(Student.objects.get(user_id_id = data[reg]["user_id_id"]).student_first_name, " was registered successfully.")
+            
+            newRegisteredUsers = [data[z]["user_id_id"] for z in data]
+            for y in Registration.objects.filter(event_id_id = request.POST["eventID"]):
+                if(y.user_id_id not in newRegisteredUsers):
+                    Registration.objects.filter(user_id_id = y.user_id_id).delete()
+                    print(Student.objects.get(user_id_id = y.user_id_id).student_first_name, " did not survive the purge.")
+
 
     RegQuery = f"SELECT registration_id, event_name, event_date, schedule_id, template_id, student_id, first_name, last_name, id, session, day, student_first_name, student_last_name, altFrontend_student.gender AS student_gender, altFrontend_student.year_group AS year_group, boarding_house, altFrontend_student.user_id_id FROM altFrontend_registration JOIN altFrontend_eventinstance ON event_id = event_id_id JOIN altFrontend_schedule ON schedule_id_id = schedule_id JOIN altFrontend_eventtemplate ON template_id = template_id_id JOIN auth_user ON auth_user.id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = altFrontend_registration.user_id_id WHERE event_id = { event_id_id_id };"
     StudentQuery = f"SELECT * FROM altFrontend_student WHERE gender =  '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).gender }' AND year_group =  '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).year_group }' "
@@ -62,8 +108,10 @@ def sheetView(request, event_id_id_id, *args, **kwargs):
         "Students" : students,
         "Registered" : registered
     }
+    context["Message"] = response["Message"] if "Message" in response else ""
     context["Event"]['_state'] = None
     context["Event"]['event_date'] = context["Event"]['event_date'].strftime("%x")
+    print("\nMessage: ", context["Message"])
     context["JSON"] = dumps(context, default=str)
 
     return render(request, 'frontend/sheet.html', context)
@@ -88,11 +136,14 @@ def homeView(request, *args, **kwargs):
 
     # Queries the Registration table for the current users registrations: all the events the user is signed up for 
     userEvents = {}
-    if not request.user.id == None:
+    if request.user.id != None:
         userEventsQuery = f"SELECT registration_id, event_id_id, registration_date, student_first_name, student_last_name, boarding_house, year_group, gender, altFrontend_student.user_id_id FROM altFrontend_registration JOIN auth_user ON id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = id WHERE altFrontend_student.user_id_id = { request.user.id };"
         userEventsQuerySet = Registration.objects.raw(userEventsQuery)
+        print(request)
         for event in userEventsQuerySet:
+            print(event)
             userEvents[event.registration_id] = event.__dict__
+            print(userEvents[event.registration_id])
             userEvents[event.registration_id]["_state"] = None
     
     # When the user clicks sign up or any other request/form submission is sent from "home.html" 
@@ -215,8 +266,6 @@ def scheduleView(request, *args, **kwargs ):
         schedule[event.schedule_id]['_state'] = None
     database_data['Schedule'] = schedule 
     context['JSON'] = dumps(database_data, default=str)
-    print("Hello?")
-    print(context['JSON'])
     return render(request, 'frontend/schedule.html', context)
 
 def editScheduleView(request, *args, **kwargs ):

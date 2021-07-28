@@ -18,8 +18,16 @@
 </head>
 <body>
     {% load tagextras %}
+    <div id="floatingfixed">
+        {%  block floatingfixed%}
+        {% endblock floatingfixed%}
+    </div>
     {% if user.is_authenticated %}
-        <button id="back-btn" onclick="goBack()"><i class="arrow back-arrow"></i></button>
+        <div id="top-left">
+            <button id="back-btn" onclick="goBack()"><i class="arrow back-arrow"></i></button>
+            <h1 id="back-hover-text" style="">Back</h1>
+            <div style="display: inline-block;margin: 0;">{% block top-left %}{% endblock%}</div>
+        </div>
     {% endif %}
     <div id="sidebar" class="sidenav">
         {% block sidebar %}
@@ -45,7 +53,7 @@
     <div id="main">
         
         {% if Message %}
-        <div id="messages" style="float:left;">{% block messages%}{{ message }}{% endblock messages%}</div>
+            <div id="messages" style="float:left;">{% block messages%}{{ Message|safe }}{% endblock messages%}</div>
         {% endif%}
 
         <div id = "topbar" style="float: right;">
@@ -66,7 +74,7 @@
         {% block main%}
             <div id="head">
             {%block head%}
-                <span class="sidenav-open-btn" style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; menu</span>
+                <span class="sidenav-open-btn" style="font-size:30px;cursor:pointer;clear:both;display:block;" onclick="openNav()">&#9776; menu</span>
                 <section id = "headtext">
                     {% block headtext %}
                         <h2>Sportshall Sign-Up</h2>

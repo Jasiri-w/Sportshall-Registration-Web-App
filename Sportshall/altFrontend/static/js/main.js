@@ -7,3 +7,10 @@ window.addEventListener("unload", () => {
 })
 
 function goBack() { window.history.back();}
+
+document.querySelector("#back-btn").addEventListener("mouseover", () => {
+    document.querySelector("#back-hover-text").style.width = "7rem"; 
+})
+document.querySelector("#back-btn").addEventListener("mouseout", () => {
+    document.querySelector("#back-hover-text").style.width = "0"; 
+})

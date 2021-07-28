@@ -169,24 +169,41 @@ a:visited {
 	-webkit-transform: rotate(135deg);
 }
 
-#back-btn{
+#top-left{
 	border: none;
 	position:relative;
+	margin: 0;
+}	
+
+#back-btn {
+	vertical-align: top;
+	border: none;
 	background-color: #eee;
 	padding: 1rem;
 	font-size: 1rem;
 	transition: .4s ease-in-out;
-	margin: 0;
 }
 
 #back-btn:hover .back-arrow {
 	/*position:absolute;
 	left: 4px;*/
 }
+#back-hover-text {
+	overflow-x:hidden;
+	display:inline-block;
+	margin:0;
+	font-size: 2.4rem;
+	font-weight: 100;
+	width: 0;
+	transition: 0.3s ease-in-out;
+}
+
 #back-btn:hover {
 	padding-left: 0.5rem;
 	cursor:pointer;
 }
+
+
 
 .rotated-180 {
 	transform: rotate(225deg);
@@ -313,4 +330,48 @@ a:visited {
 }
 #teacherBlock:not(.toggled){
 	display:none;
+}
+
+#floatingfixed {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+}
+.save-btn {
+	font-size: 1rem;
+	border: none;
+	border-radius: 6px;
+	padding: 14px 16px;
+	color: #eee;
+	background-color: rgba(255, 105, 180, 0.6);
+	transition: 0.2s ease-in-out;
+}
+
+.save-btn:hover {
+	background-color: rgba(255, 105, 180, 1);
+	color: white;
+	margin-bottom: 4px;
+	font-size: 1.05rem;
+	cursor: pointer;
+}
+
+#userEventBlock{
+	display: flex;
+    align-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+.user-event{
+	cursor: pointer;
+	padding: 3px;
+	transition: .2s ease-in-out;
+}
+.user-event:hover {
+	margin-right: 5px;
+}
+.user-event:hover h3::after{
+	content: "\25be";
+	color: hotpink;
+	padding: 2px;
 }

@@ -11,34 +11,22 @@
 {% block column1%}
 	{% load tagextras %}
 
-	{% if user|has_group:"Teacher" or user.is_superuser %} 
-		<p>
-			<form action="/addName/" method="post" onSubmit="return addCycle(event)" id="inputForm">
-				{% csrf_token %}
-				<!--<input type="text" id="newNameInput" value=""></input>-->
-				<input list="names" name="newNameInput" id="newNameInput" value="" autocomplete="off"/>
-				<datalist id="names">
-					{% for Student in Students %}
-						<option value={{ Student.student_first_name }}>
-					{% endfor %}
-				</datalist>
-				<input type="submit"  id="addButton" class="addBtn" value="Add"></input>
-				<button type="reset" id='clearbtn'>Clear All</button>
+	<div {% if user|has_group:"Teacher" or user.is_superuser %} {%else%} style="display: none" {% endif %}>
+		<p style="margin-bottom: 0; padding-bottom: 0;">Add a Student:</p>
+		<form action="/addName/" method="post" onSubmit="return addCycle(event)" id="inputForm" style="margin-top: 0; padding-top: 0;">
+			{% csrf_token %}
+			<!--<input type="text" id="newNameInput" value=""></input>-->
+			<input list="names" name="newNameInput" id="newNameInput" value="" autocomplete="off"/>
+			<datalist id="names">
+				{% for Student in Students %}
+					<option value={{ Student.student_first_name }}>
+				{% endfor %}
+			</datalist>
+			<input type="submit"  id="addButton" class="addBtn" value="Add"></input>
+			<button type="reset" id='clearbtn'>Clear All</button>
 
-			</form>
-		</p>
-	{% else %}
-		<p>
-			<form action="/sign-up/" method="post" onSubmit="" id="signUpForm">
-				{%csrf_token%}
-				{{ form.as_p }}
-				<p>Max: {{ Event.maximum_capacity }}</p>
-				<input type="hidden" name="userID" value="{{ user.id  }}"></input>
-				<input type="hidden" name="eventID" value="{{ Event.event_id }}"></input>
-				<input type="submit"  id="addButton" class="addBtn" value="Sign Up"></input>
-			</form>
-		</p>
-	{% endif %}
+		</form>
+	</div>
 	{% for r in Registered%}
 		<!--<p class='name' onclick='remove(this)' data-id="{{ r.registration_id }}"><em> " + u + ". " + names[i].name + " - " + names[i].bhouse + " - Year " + names[i].yeargroup + "</em></p>-->
 	{% endfor %}
@@ -46,6 +34,28 @@
 		<!--<p class="">{{ r.registration_id }} - {{ r.first_name }} - {{ r.sport_name }}</p>-->
 	{% endfor %}
 {% endblock column1%}
+{% block floatingfixed%}
+{% if user|has_group:"Teacher" or user.is_superuser %}
+	<form method="POST" onsubmit="">
+		{% csrf_token %}
+		<input type="hidden" name="listData" value=""></input>
+		<input type="hidden" id="" name="postIntent" value="Save-List"></input>
+		<input type="hidden" id="eventData" name="eventData" value=""></input>
+		<input type="hidden" id="eventID" name="eventID" value="{{ Event.event_id }}"></input>
+		<input type="submit" class="save-btn" value="Save"></input>
+	</form>
+{% elif user.is_authenticated or user.is_superuser %}
+	<form method="POST" onsubmit="" id="signUpForm">
+		{% csrf_token %}
+		<input type="hidden" id="" name="postIntent" value="Sign-Up"></input>
+		<input type="hidden" id="eventData" name="eventData" value=""></input>
+		<input type="hidden" id="templateID" name="templateID" value="{{ Event.template_id}}"></input>
+		<input type="hidden" id="eventID" name="eventID" value="{{ Event.event_id }}"></input>
+		<input type="submit" class="save-btn" value="Sign Up"></input>
+	</form>
+{% endif %}
+{% endblock floatingfixed%}
+
 {% block scripts %}
 <script>
 	/**var students = [
@@ -73,6 +83,23 @@
 
 	console.log(data);
 
+	var is_user= false;
+	var is_teacher = true;
+	
+	if(String('{{user.is_authenticated}}') == "True"){
+		is_user = true;
+	}else{
+		is_user = false;
+	}
+
+	if(String('{{user|has_group:"Teacher"}}') == "True" || String('{{user.is_superuser}}') == "True"){
+		is_teacher = true;
+	}else{
+		is_teacher = false;
+	}
+
+	document.querySelector("[name = eventData]").value = EventData;
+
 	var names = [];//["Ronaldo" , "Messi" , "Ontario" , "Margaux" , "Jameson", "Mallard" , "Lingard" , "Jenkins" , "Caboose" , "Sarge" , "Agent Texas" , "Agent Washington" , "Agent Mane"];
 
 	var container = document.getElementById("container");
@@ -89,6 +116,12 @@
 			document.querySelector("#names").innerHTML += "<option id = '" + Students[s]["student_id"] + "' value='" + Students[s]["student_first_name"] + " " + Students[s]["student_last_name"] + "''>";
 		}
 		DisplayStudents();
+	}
+
+	function FillInputs(){
+		if(document.querySelector("[name = 'listData']") != null){
+			document.querySelector("[name = 'listData']").value = JSON.stringify(RegisteredStudents);
+		}
 	}
 
 	function DisplayStudents(){
@@ -111,11 +144,13 @@
 			if(count-1 >= 10){
 				currentColumn = column2;
 			}
-			currentColumn.innerHTML += "<p class='name' onclick='remove(this)' id=" + RegisteredStudents[Student]['student_id'] + "><em>" + count + ". " + RegisteredStudents[Student]['student_first_name'] + " " + RegisteredStudents[Student]['student_last_name'] + " - " + RegisteredStudents[Student]['boarding_house'] + " - Year " + RegisteredStudents[Student]['year_group'] + "</em></p>";// 1. John
+			var removability = (is_teacher) ? "onclick='remove(this)'" : "";
+			var nameClassability = (is_teacher) ? "name" : "";
+			currentColumn.innerHTML += "<p class='" + nameClassability + "' " + removability + " id=" + RegisteredStudents[Student]['student_id'] + "><em>" + count + ". " + RegisteredStudents[Student]['student_first_name'] + " " + RegisteredStudents[Student]['student_last_name'] + " - " + RegisteredStudents[Student]['boarding_house'] + " - Year " + RegisteredStudents[Student]['year_group'] + "</em></p>";// 1. John
 		}
 
 		document.getElementById('newNameInput').focus();
-		
+		FillInputs();		
 	}
 
 	//displayNames(names);
@@ -252,6 +287,8 @@
 	function revertToLastSave(){
 		RegisteredStudents = data["Registered"];
 	}
+
+	console.log(typeof {{user.is_authenticated}});
 
 </script>
 {% endblock scripts%}
