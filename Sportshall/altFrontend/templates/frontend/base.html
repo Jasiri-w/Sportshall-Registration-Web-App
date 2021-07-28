@@ -9,6 +9,7 @@
 
     {% load static %}
     <link rel="stylesheet" type="text/css" charset="utf-8"  href="{% static "css/main.css" %}"/>
+    
     {% block extraLinks%}
     {% endblock extraLinks%}
     <style>
@@ -107,7 +108,11 @@
 	</div>
     <script src="{% static "js/sidebar.js " %}"></script>
     <script src="{% static "js/main.js " %}"></script>
+    <script src="{% static "js/feather.js" %}"></script>
     {% block scripts%}
     {% endblock scripts%}
+    <script>
+        feather.replace()
+    </script>
 </body>
 </html>

@@ -65,6 +65,15 @@ a:visited {
 	font-size: 3rem;
 }
 
+button, .addBtn { 
+	border: none;
+	padding: 0.6rem;
+	margin: 0 4px;
+	background-color: hotpink;
+	color: white;
+	cursor: pointer;
+}
+
 .loaded {
 	animation: fadeIn 1s ease-in 0.7s forwards /*,slideIn 0.8s ease-in 0.9s forwards*/;
 }
@@ -313,15 +322,19 @@ a:visited {
 
 .eventBlock{
 	box-sizing: border-box;
+	position: relative;
 	/*border: 4px solid black;*/
-	padding: 12px;
+	padding: 12px 20px;
 	margin: 0 10px;
 	min-width: 13rem;
-	transition: padding-left 0.4s ease-in-out, padding-right 0.4s ease-in-out ;
+	transition: margin-left 0.3s ease-in-out, margin-right 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 .eventBlock:hover{
-	padding-left: 6px;
-	padding-right: 18px;
+	margin-left: 6px;
+	margin-right: 18px;
+	box-shadow: 7px 7px 49px -28px rgba(67,66,66,0.48);
+	-webkit-box-shadow: 7px 7px 49px -28px rgba(67,66,66,0.48);
+	-moz-box-shadow: 7px 7px 49px -28px rgba(67,66,66,0.48);
 }
 
 #teacherBlock {
@@ -374,4 +387,23 @@ a:visited {
 	content: "\25be";
 	color: hotpink;
 	padding: 2px;
+}
+#event-check{
+	position: absolute;
+	right: 15px;
+	top: 15px;
+	visibility: hidden;
+	color: green;
+}
+#leave-form{
+	cursor: pointer;
+	position: absolute;
+	top: 8px;
+	left: 15px;
+	display:none;
+	transition: 0.2s ease-in-out;
+	color: maroon;
+}
+.eventBlock:hover #leave-form.displayed{
+	display: block;
 }

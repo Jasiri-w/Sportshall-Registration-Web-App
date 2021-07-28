@@ -124,6 +124,25 @@ def homeView(request, *args, **kwargs):
 
     # All the values/parameters/variables passed to the html through Django's rendering function: a dict of data passed to the frontend
     context = {}
+    response = ""
+    # When the user clicks sign up or any other request/form submission is sent from "home.html" 
+    if  request.method == 'POST':
+        if request.POST["postIntent"] =="Leave":
+            Registration.objects.filter(event_id = request.POST['eventID']).filter(user_id = request.user.id).delete()
+            response = "<span style='color: green;'><em>Succesfully left "+ str(EventTemplate.objects.get(template_id = Schedule.objects.get(eventinstance = EventInstance.objects.get(event_id = 32)).template_id_id).event_name) +"</em></span>"
+        elif request.POST["postIntent"] == "Sign-Up":
+            # Checks to see if a Registration table entry already exists with both the specific event ( which changes every new time the event comes) and linked to the user    
+            if not Registration.objects.filter(event_id = request.POST['eventID']).filter(user_id = request.POST['userID']).exists():
+                vent = EventInstance.objects.get(event_id = request.POST['eventID'])
+                newRegistration = Registration(
+                    registration_date = datetime.datetime.now(),
+                    event_id_id = vent.event_id,
+                    user_id_id = request.POST['userID'],
+                )
+                newRegistration.save()
+            else:
+                # If the user is already registered write this at the top of the page
+                response = "<span style='color: red;'><em>You are already signed up for this activity</em></span>"
 
     # Upcoming events such as tonights basketball or tommorrow mornings squash
     upcomingevents = []
@@ -139,31 +158,14 @@ def homeView(request, *args, **kwargs):
     if request.user.id != None:
         userEventsQuery = f"SELECT registration_id, event_id_id, registration_date, student_first_name, student_last_name, boarding_house, year_group, gender, altFrontend_student.user_id_id FROM altFrontend_registration JOIN auth_user ON id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = id WHERE altFrontend_student.user_id_id = { request.user.id };"
         userEventsQuerySet = Registration.objects.raw(userEventsQuery)
-        print(request)
         for event in userEventsQuerySet:
-            print(event)
             userEvents[event.registration_id] = event.__dict__
-            print(userEvents[event.registration_id])
             userEvents[event.registration_id]["_state"] = None
     
-    # When the user clicks sign up or any other request/form submission is sent from "home.html" 
-    if  request.method == 'POST':
-        # Checks to see if a Registration table entry already exists with both the specific event ( which changes every new time the event comes) and linked to the user
-        if not Registration.objects.filter(event_id = request.POST['eventID']).filter(user_id = request.POST['userID']).exists():
-            vent = EventInstance.objects.get(event_id = request.POST['eventID'])
-            newRegistration = Registration(
-                registration_date = datetime.datetime.now(),
-                event_id_id = vent.event_id,
-                user_id_id = request.POST['userID'],
-            )
-            newRegistration.save()
-        else:
-            # If the user is already registered write this at the top of the page
-            context["Message"] = "<span style='color: red;'><em>You are already signed up for this activity<em></span>"
 
     context = {
         #"Students" : [student for student in Student.objects.all()], Until we decide wether we want to show whos signed up for what
-        #"Registrations" : [reg for reg in Registration.objects.all()],
+        "Registrations" : [reg.__dict__ for reg in Registration.objects.all()],
         "UpcomingEvents" : upcomingevents,
         "UserEvents" : userEvents,
         "UpcomingEventsDict" : {},
@@ -174,7 +176,11 @@ def homeView(request, *args, **kwargs):
     for event in upcomingevents:
         context["UpcomingEventsDict"][event.event_id] = event.__dict__
         context["UpcomingEventsDict"][event.event_id]["_state"] = None
+    
+    for event in context["Registrations"]:
+        event["_state"] = None
 
+    context["Message"] = response
     context["JSON"] = dumps(context, default=str)
 
     return render(request, 'frontend/home.html', context)

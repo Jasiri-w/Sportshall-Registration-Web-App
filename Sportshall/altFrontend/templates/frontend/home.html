@@ -88,6 +88,7 @@ Home
 var data = JSON.parse("{{JSON|escapejs}}");
 var UserEvents = data["UserEvents"];
 var UpcomingEvents = data["UpcomingEventsDict"];
+var Registrations = data["Registrations"];
 /**var csrftoken = "{% csrf_token %}";
 console.log("{% csrf_token %}");
 console.log(csrftoken);
@@ -110,15 +111,21 @@ for(var ev in UpcomingEvents){
     }
 }
 
-
-
-
 for(var x in UpcomingEvents){
     var event = UpcomingEvents[x];
     var query = "#" + event.day + "-" + event.session + " .eventBlockContainer";
     var el = document.querySelector(query);
-    el.innerHTML +='<div class="eventBlock" id="' + event.event_id + '"><form action="" method="post" onsubmit="" id="signUpForm">{% csrf_token %}<h3>' + event.event_name + '</h3><p>Max: ' + event.maximum_capacity + '</p><p>' + event.gender + '</p><p>Year ' + event.year_group + '</p><input type="hidden" id="userID" name="userID" value="'+ {{ user.id }} +'"><input type="hidden" id="templateID" name="templateID" value="' + event.template_id + '"><input type="hidden" id="eventID" name="eventID" value="' + event.event_id + '"><input type="submit" id="addButton" class="addBtn" value="Sign Up"><a href="/sheet/' + event.event_id + '" class="view-list">View List &gt; </a></form></div>'
+    var rcount = 0
+    for(y in Registrations){
+        if(Registrations[y].event_id_id == event.event_id){
+            rcount++;
+        }
+    }
+    var leaveForm = '<form id="leave-form" action="" method="post">{% csrf_token %}<input type="hidden" id="" name="postIntent" value="Leave"></input><input type="hidden" name="eventID" value="'+ event.event_id +'"><button type="submit" value="" style="border:none;background:none;padding: 0;"><i data-feather="x" id="event-leave" style="color:maroon;"></i></button></form>'
+    el.innerHTML +='<div class="eventBlock" id="' + event.event_id + '"><form action="" method="post" onsubmit="" id="signUpForm">{% csrf_token %}<i data-feather="check-circle" id="event-check"></i><h3>' + event.event_name + '</h3><p>Year ' + event.year_group + ' ' + event.gender +'s</p><p>' + rcount +'/' + event.maximum_capacity + ' Signed Up</p><input type="hidden" id="userID" name="userID" value="'+ {{ user.id }} +'"><input type="hidden" id="" name="postIntent" value="Sign-Up"></input><input type="hidden" id="templateID" name="templateID" value="' + event.template_id + '"><input type="hidden" id="eventID" name="eventID" value="' + event.event_id + '"><input type="submit" id="addButton" class="addBtn" value="Sign Up"><a href="/sheet/' + event.event_id + '" class="view-list">View List &gt; </a></form>' + leaveForm +'</div>'
 }
+
+
 
 Array.from(document.getElementsByClassName("toggle-arrow")).forEach(element => element.addEventListener('click', function (event) {
     event.preventDefault();
@@ -154,7 +161,11 @@ for(var x in UpcomingEvents){
                 if(el.children[0].children[i].id == "addButton"){
                     el.children[0].children[i].remove();
                 }
+                if(el.children[0].children[i].id == "event-check"){
+                    el.children[0].children[i].style.visibility = "visible";
+                }
             }
+            el.children[1].classList.add("displayed");
         }
     }
 }
