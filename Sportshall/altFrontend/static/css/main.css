@@ -15,6 +15,17 @@
 	--secondary: #ff652f;
 }
 
+@media print{
+	*{
+		margin: 0;
+		padding: 0;
+		-webkit-print-color-adjust: exact;
+	}
+	.no-print{
+		display: none;
+	}
+}
+
 html, body{
 	font-family: "Lato", sans-serif;
 	max-height: 100%;
@@ -65,14 +76,17 @@ a:visited {
 	font-size: 3rem;
 }
 
-button, .addBtn { 
-	border: none;
+button, .addBtn, .save-schedule-btn { 
+	box-sizing:border-box;
+	border: 2px solid hotpink;
 	padding: 0.6rem;
 	margin: 0 4px;
 	background-color: hotpink;
 	color: white;
 	cursor: pointer;
+	transition: 0.4s ease-in-out;
 }
+
 
 .loaded {
 	animation: fadeIn 1s ease-in 0.7s forwards /*,slideIn 0.8s ease-in 0.9s forwards*/;
@@ -186,6 +200,7 @@ button, .addBtn {
 
 #back-btn {
 	vertical-align: top;
+	margin: 0;
 	border: none;
 	background-color: #eee;
 	padding: 1rem;
@@ -222,7 +237,7 @@ button, .addBtn {
 #main{
 	height:100%;
 	margin: 0 5.2rem;
-	transition: margin-left .5s;
+	transition: margin-left .6s;
 	padding: 16px;
 }
 
@@ -243,17 +258,21 @@ button, .addBtn {
 	left: 0;
 	background-color: var(--bg-color-2);
 	overflow-x: hidden;
-	transition: 0.5s;
-	padding-top: 60px;
+	transition: 0.6s ease-in-out;
+	padding-top: 90px;
 }
 
 .sidenav a {
-	padding: 8px 8px 8px 32px;
+	padding: 8px 8px 12px 32px;
 	text-decoration: none;
 	font-size: 25px;
 	color: #bbb;
 	display: block;
 	transition: 0.3s;
+}
+.nav-icon{
+	font-size: 25px;
+	margin-right: 6px;
 }
 
 .sidenav a:hover {
@@ -398,8 +417,8 @@ button, .addBtn {
 #leave-form{
 	cursor: pointer;
 	position: absolute;
-	top: 8px;
-	left: 15px;
+	bottom: 8px;
+	right: 15px;
 	display:none;
 	transition: 0.2s ease-in-out;
 	color: maroon;

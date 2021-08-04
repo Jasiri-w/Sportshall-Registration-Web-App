@@ -9,8 +9,20 @@
 }
 table {
     width: 100%;
-    max-width: 50rem;
 }
+
+.tableContainer {
+    max-width: 100%;
+    overflow-x:auto;
+}
+
+@media print{
+    .tableContainer {
+        max-width: 100%;
+        overflow-x: visible;
+    }
+}
+
 table tr:nth-child(odd) th {
     color: #ccc;
     font-weight: normal;
@@ -38,35 +50,46 @@ table td > span {
 
 .cellcontent{
     margin: 5px 0;
-    padding: 0.5rem 1rem;
+    padding: 1.2rem 1.2rem;
     box-sizing: border-box;
     text-align: justify;
     border-radius: 0.2rem;
     width: 100%;
 }
 
-.cellcontent:hover{
+.cellcontent[draggable = "True"]:hover{
     cursor: grab;
     cursor: -moz-grab;
     cursor: -webkit-grab;
 }
-.cellcontent:active{
+
+
+.cellcontent[draggable = "True"]:active{
     cursor: grabbing;
     cursor: -moz-grabbing;
     cursor: -webkit-grabbing;
 }
 
-.cellcontent:before {
+.cellcontent[draggable = "True"]:hover .cellcontent::before {
+    cursor: pointer;
     color: white;
     content: '\00d7';
     /* color: #fff; */
     font-weight: 300;
     position: relative;
-    top: px;
+    top: 3px;
 }
 
 .cellcontent.edit{
     margin: 0.2rem;
+}
+
+.cellcontent p{
+    font-size: 0.8rem;
+}
+
+.cellcontent span{
+    font-weight: 200;
 }
 
 .over {
@@ -84,4 +107,14 @@ table td > span {
 #saveTableButtonDiv {
     position: sticky;
     top: 10%;
+}
+
+#saveTableForm, .save-schedule-btn, .clearbtn{
+    display: inline-block;
+}
+
+button:hover{
+	border: 2px solid hotpink;
+	background: none;
+	color: black;
 }

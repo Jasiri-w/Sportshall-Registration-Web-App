@@ -45,14 +45,23 @@
 		<input type="submit" class="save-btn" value="Save"></input>
 	</form>
 {% elif user.is_authenticated or user.is_superuser %}
-	<form method="POST" onsubmit="" id="signUpForm">
-		{% csrf_token %}
-		<input type="hidden" id="" name="postIntent" value="Sign-Up"></input>
-		<input type="hidden" id="eventData" name="eventData" value=""></input>
-		<input type="hidden" id="templateID" name="templateID" value="{{ Event.template_id}}"></input>
-		<input type="hidden" id="eventID" name="eventID" value="{{ Event.event_id }}"></input>
-		<input type="submit" class="save-btn" value="Sign Up"></input>
-	</form>
+	{% if IsRegistered %}
+		<form id="leaveForm" method="post" alt="Quit this activity">
+			{% csrf_token %}
+			<input type="hidden" id="" name="postIntent" value="Leave"></input>
+			<input type="hidden" name="eventID" value="{{ Event.event_id }}">
+			<input type="submit" class="save-btn" value="Quit"></input>
+		</form>
+	{% else %}
+		<form method="POST" onsubmit="" id="signUpForm">
+			{% csrf_token %}
+			<input type="hidden" id="" name="postIntent" value="Sign-Up"></input>
+			<input type="hidden" id="eventData" name="eventData" value=""></input>
+			<input type="hidden" id="templateID" name="templateID" value="{{ Event.template_id}}"></input>
+			<input type="hidden" id="eventID" name="eventID" value="{{ Event.event_id }}"></input>
+			<input type="submit" class="save-btn" value="Sign Up"></input>
+		</form>
+	{% endif %}
 {% endif %}
 {% endblock floatingfixed%}
 
@@ -98,7 +107,9 @@
 		is_teacher = false;
 	}
 
-	document.querySelector("[name = eventData]").value = EventData;
+	if(document.querySelector("[name = eventData]") != null){
+		document.querySelector("[name = eventData]").value = EventData;
+	}
 
 	var names = [];//["Ronaldo" , "Messi" , "Ontario" , "Margaux" , "Jameson", "Mallard" , "Lingard" , "Jenkins" , "Caboose" , "Sarge" , "Agent Texas" , "Agent Washington" , "Agent Mane"];
 
@@ -135,6 +146,10 @@
 		var column1 = document.getElementById("column1");
 		var column2 = document.getElementById("column2");
 		var currentColumn = column1;
+		
+		if(Object.keys(RegisteredStudents).length == 0){
+			currentColumn.innerHTML += "<h1 style='color: #ccc;font-weight: 700;' id='no-student-text'><em>No Students Yet...</em></h1>"
+		}
 		count = 0;
 		for(var Student in RegisteredStudents){
 			count++;

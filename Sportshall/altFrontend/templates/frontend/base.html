@@ -3,6 +3,7 @@
 <head>
     {% block metas %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
 	<meta charset="utf-8">
     {% endblock metas %}
     <title> {% block title %} Page Title {% endblock title %}</title>
@@ -19,32 +20,32 @@
 </head>
 <body>
     {% load tagextras %}
-    <div id="floatingfixed">
+    <div id="floatingfixed" class="no-print">
         {%  block floatingfixed%}
         {% endblock floatingfixed%}
     </div>
     {% if user.is_authenticated %}
-        <div id="top-left">
+        <div id="top-left" class="no-print">
             <button id="back-btn" onclick="goBack()"><i class="arrow back-arrow"></i></button>
             <h1 id="back-hover-text" style="">Back</h1>
             <div style="display: inline-block;margin: 0;">{% block top-left %}{% endblock%}</div>
         </div>
     {% endif %}
-    <div id="sidebar" class="sidenav">
+    <div id="sidebar" class="sidenav no-print">
         {% block sidebar %}
 		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-		<a href="/">Home</a>
-        <a href="/schedule/">Week Schedule</a>
+		<a href="/"><i data-feather="home" class="nav-icon"></i><span class="nav-text">Home</span></a>
+        <a href="/schedule/"><i data-feather="calendar" class="nav-icon"></i><span class="nav-text">Week Schedule</span></a>
 		<!--<a href="/add-new-student/">Add Student</a>-->
         {% if user|has_group:"Teacher" or user.is_superuser %}
-        <hr>
-		<a href="/edit-events/">Create Activity</a>
+        <hr width="10%">
+		<a href="/edit-events/"><i data-feather="edit" class="nav-icon"></i><span class="nav-text">Create Activity</span></a>
         {%endif%}
         <section id="bottom" style = "position: absolute; bottom: 100px;">
 		    {% if user.is_authenticated%}
-                <a href="#">Settings</a>
+                <a href="#"><i data-feather="settings" class="nav-icon"></i><span class="nav-text">Settings</span></a>
                 {% if user.is_superuser%}
-                <a href="/admin/">Django Admin</a>
+                <a href="/admin/"><i data-feather="tool" class="nav-icon"></i>Django Admin</a>
                 {% endif %}
             {% endif %}
         </section>
@@ -54,10 +55,10 @@
     <div id="main">
         
         {% if Message %}
-            <div id="messages" style="float:left;">{% block messages%}{{ Message|safe }}{% endblock messages%}</div>
+            <div id="messages" style="float:left;"class="no-print">{% block messages%}{{ Message|safe }}{% endblock messages%}</div>
         {% endif%}
 
-        <div id = "topbar" style="float: right;">
+        <div id = "topbar" style="float: right;" class="no-print">
         {% block topbar %}
         
             {% if user.is_authenticated %}
@@ -73,7 +74,7 @@
         {% endblock top %}
 
         {% block main%}
-            <div id="head">
+            <div id="head" class="no-print">
             {%block head%}
                 <span class="sidenav-open-btn" style="font-size:30px;cursor:pointer;clear:both;display:block;" onclick="openNav()">&#9776; menu</span>
                 <section id = "headtext">

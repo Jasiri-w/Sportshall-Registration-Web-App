@@ -8,62 +8,74 @@
 	<h2>Weekly Schedule</h2>
 	<p>Last updated at time:o:clock</p>
 {% endblock headtext %}
+{% load tagextras %}
+{% block floatingfixed%}
+{% if user|has_group:"Teacher" or user.is_superuser %}
+<div id="saveTableButtonDiv" class="no-print">
+    <button class="clearbtn" onclick="clearEvents()">Clear All</button>
+    <button class="clearbtn" onclick="revertSave()">Revert to last Save</button>
+    <form method="post" onSubmit="fillInputs()" action="" id="saveTableForm">
+        {% csrf_token %}
+        <input type="hidden" name="userID" value="{{ user.id }}" id="">
+        <input type="hidden" name="tableData" value="" id="tableDataInput">
+        <input type="submit" name="savebtn" class="save-schedule-btn" id="savebtn" value="Save">
+        <!--<button type="submit" id="resetSchedule"></button>-->
+    </form>
+</div>
+{% endif %}
+{% endblock %}
 {% block container%}
     <section id="scheduleContainer">
-    <div>
-        <h1>Add Activities</h1>
-        <div id="editRowContent" style="display: flex; clear: right;">
-            {% for event in EventTemplates%}
-                <div class="cellcontent edit" draggable="True" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" id="{{ event.template_id }}">
-                <p> {{event.event_name}} </p><span>Year {{event.year_group}} {{event.gender}}'s</span>
-                </div>
-            {% endfor %}
-        </div>
+    <div class="no-print">
+        {% if user|has_group:"Teacher" or user.is_superuser %}
+            <h1>Add Activities</h1>
+            <h2><em>~ Drag and drop activities into schedule below</em></h2>
+            <div id="editRowContent" style="display: flex; clear: right;">
+                {% for event in EventTemplates%}
+                    <div class="cellcontent edit" draggable="True" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" id="{{ event.template_id }}">
+                    <p> {{event.event_name}} </p><span>Year {{event.year_group}} {{event.gender}}'s</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
     <h1>This Weeks Schedule</h1>
-    <div id="saveTableButtonDiv">
-        <form method="post" onSubmit="fillInputs()" action="" id="saveTableForm">
-            {% csrf_token %}
-            <input type="hidden" name="userID" value="{{ user.id }}" id="">
-            <input type="hidden" name="tableData" value="" id="tableDataInput">
-            <input type="submit" name="savebtn" id="savebtn" value="Save">
-            <!--<button type="submit" id="resetSchedule"></button>-->
-        </form>
-            <button class="clearbtn" onclick="clearEvents()">Clear All</button>
-            <button class="clearbtn" onclick="revertSave()">Revert to last Save</button>
+    <div class="tableContainer">
+        <table id="scheduleTable">
+            <body>
+                <tr id="tableHeaders">
+                    <th>Time</th>
+                    <td colspan="1" class="">Monday</td>
+                    <td colspan="1" class="">Tuesday</td>
+                    <td colspan="1" class="">Wednesday</td>
+                    <td colspan="1" class="">Thursday</td>
+                    <td colspan="1" class="">Friday</td>
+                    <td colspan="1" class="">Saturday</td>
+                    <td colspan="1" class="">Sunday</td>
+                </tr>
+                <tr>
+                    <th>Morning</th>
+                    <!--<td colspan="1" rowspan="2" class="green" id="test"><p></p><span></span></td>-->
+                </tr>
+                <!--<tr>
+                    <th>Lunch</th>
+                    
+                </tr>
+                <tr>
+                    <th>Games</th>
+                    
+                </tr>-->
+                <tr>
+                    <th>Evening</th>
+                    
+                </tr>
+                
+            </body>
+        </table>
+        <button style="font-size:1rem;"onclick="exportTableToExcel('scheduleTable', 'sportshall-activities-schedule')" class="no-print">Export <i data-feather="external-link" class=""></i></button>
+        <button style="font-size:1rem;"onclick="window.print()" class="no-print">Print <i data-feather="printer" ></i></button>
     </div>
-    <table id="scheduleTable">
-        <body>
-            <tr id="tableHeaders">
-                <th>Time</th>
-                <td colspan="1" class="">Monday</td>
-                <td colspan="1" class="">Tuesday</td>
-                <td colspan="1" class="">Wednesday</td>
-                <td colspan="1" class="">Thursday</td>
-                <td colspan="1" class="">Friday</td>
-                <td colspan="1" class="">Saturday</td>
-                <td colspan="1" class="">Sunday</td>
-            </tr>
-            <tr>
-                <th>Morning</th>
-                <!--<td colspan="1" rowspan="2" class="green" id="test"><p></p><span></span></td>-->
-            </tr>
-            <!--<tr>
-                <th>Lunch</th>
-                
-            </tr>
-            <tr>
-                <th>Games</th>
-                
-            </tr>-->
-            <tr>
-                <th>Evening</th>
-                
-            </tr>
-            
-        </body>
-    </table>
-    <div id = "upload">
+    <div id = "upload" class="no-print">
         <h3>Upload a schedule (.csv)</h3>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -276,7 +288,14 @@
         }*/
         counter++;
         //console.log("Counter: " + counter + "\nEvent: " + data['EventTemplates'][x]["event_name"] + "\nYear: " + data['EventTemplates'][x]["year_group"]  + "\ndata['EventTemplates'].x: " + data['EventTemplates'][x]);
-        newEventElem = '<div id="' + generateID() +'"class="cellcontent copy" data-color="" draggable="True" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" data-template-id="' + data['EventTemplates'][data["Schedule"][x].template_id_id]["template_id"] +'"><p>'+ data['EventTemplates'][data["Schedule"][x].template_id_id]["event_name"] +'</p><span>Year '+ data['EventTemplates'][data["Schedule"][x].template_id_id]["year_group"] + ' ' +data['EventTemplates'][data["Schedule"][x].template_id_id]["gender"] + 's</span></div></td>';
+
+        if(String('{{user|has_group:"Teacher"}}') == "True" || String('{{user.is_superuser}}') == "True"){
+            var is_teacher = true;
+            newEventElem = '<div id="' + generateID() +'"class="cellcontent copy teacher" data-color="" draggable="True" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" data-template-id="' + data['EventTemplates'][data["Schedule"][x].template_id_id]["template_id"] +'"><p>'+ data['EventTemplates'][data["Schedule"][x].template_id_id]["event_name"] +'</p><span>Year '+ data['EventTemplates'][data["Schedule"][x].template_id_id]["year_group"] + ' ' +data['EventTemplates'][data["Schedule"][x].template_id_id]["gender"] + 's</span></div></td>';
+        }else{
+            var is_teacher = false;
+            newEventElem = '<div id="' + generateID() +'"class="cellcontent copy" data-color="" draggable="False" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" data-template-id="' + data['EventTemplates'][data["Schedule"][x].template_id_id]["template_id"] +'"><p>'+ data['EventTemplates'][data["Schedule"][x].template_id_id]["event_name"] +'</p><span>Year '+ data['EventTemplates'][data["Schedule"][x].template_id_id]["year_group"] + ' ' +data['EventTemplates'][data["Schedule"][x].template_id_id]["gender"] + 's</span></div></td>';
+        }
         /*console.log("Session: " + data["Schedule"][x]["session"]);
         console.log("Day :" + data["Schedule"][x]["day"]);
         console.log("Row Header: " + rowHeaders[data["Schedule"][x]["session"]]);
@@ -316,10 +335,12 @@
 
     counter= 0;
     for(var x in data["EventTemplates"]){
-        parent = document.querySelector("#editRowContent");
-        newEditElem = '<div class="cellcontent edit" draggable="True" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" data-color="" data-template-id="' + data['EventTemplates'][x]["template_id"] +'" id="' + data['EventTemplates'][x]["template_id"] +'"><p>'+ data['EventTemplates'][x]["event_name"] +'</p><span>Year '+ data['EventTemplates'][x]["year_group"] + ' ' +data['EventTemplates'][x]["gender"] + 's</span></div>';
-        parent.innerHTML +=newEditElem;
-        counter++;
+        if( document.querySelector("#editRowContent") != null){
+            parent = document.querySelector("#editRowContent");
+            newEditElem = '<div class="cellcontent edit" draggable="True" ondragstart="drag(event,this)" ondragend="endDrag(event, this)" data-color="" data-template-id="' + data['EventTemplates'][x]["template_id"] +'" id="' + data['EventTemplates'][x]["template_id"] +'"><p>'+ data['EventTemplates'][x]["event_name"] +'</p><span>Year '+ data['EventTemplates'][x]["year_group"] + ' ' +data['EventTemplates'][x]["gender"] + 's</span></div>';
+            parent.innerHTML +=newEditElem;
+            counter++;
+        }
     }
 
     color();
@@ -332,5 +353,18 @@
             document.querySelectorAll('#test > span').innerHTML = z;
         }
     }*/
+
+    // Not being used as the table shape depends on the whole page being there
+    function printTable() {
+        var printContents = document.getElementById("scheduleContainer").innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+    }
+
     </script>
 {% endblock scripts%}

@@ -57,6 +57,11 @@ def sheetView(request, event_id_id_id, *args, **kwargs):
         if request.POST["postIntent"] == "Sign-Up":
             response = signUp(request)
 
+        # quit event
+        if request.POST["postIntent"] =="Leave":
+            Registration.objects.filter(event_id = request.POST['eventID']).filter(user_id = request.user.id).delete()
+            response = "<span style='color: green;'><em>Succesfully left "+ str(EventTemplate.objects.get(template_id = Schedule.objects.get(eventinstance = EventInstance.objects.get(event_id = 32)).template_id_id).event_name) +"</em></span>"
+
         # save list and register students
         elif request.POST["postIntent"] == "Save-List":
             data = loads(request.POST["listData"])
@@ -99,14 +104,18 @@ def sheetView(request, event_id_id_id, *args, **kwargs):
         students[el.student_id]['_state'] = None
         #print("students[el.students_id] ", students[el.student_id])
     registered = {}
+    is_registered = False
     for el in Registration.objects.raw(str(RegQuery)):
+        if(el.id == request.user.id):
+            is_registered = True
         registered[el.student_id] = el.__dict__
         registered[el.student_id]['_state'] = None
 
     context = {
         "Event" : EventInstance.objects.raw(EventQuery)[0].__dict__,
         "Students" : students,
-        "Registered" : registered
+        "Registered" : registered,
+        "IsRegistered" : is_registered
     }
     context["Message"] = response["Message"] if "Message" in response else ""
     context["Event"]['_state'] = None
@@ -140,6 +149,7 @@ def homeView(request, *args, **kwargs):
                     user_id_id = request.POST['userID'],
                 )
                 newRegistration.save()
+                response = "<span style='color: green;'><em>Signed Up Successfully</em></span>"
             else:
                 # If the user is already registered write this at the top of the page
                 response = "<span style='color: red;'><em>You are already signed up for this activity</em></span>"
