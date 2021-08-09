@@ -70,10 +70,40 @@ class Student(models.Model):
 
 class Registration(models.Model):
     # Choices [Tuples or Enumerations]
-    
 
     # Columns / Fields
     registration_id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE)
     event_id = models.ForeignKey(EventInstance, on_delete=models.CASCADE)
     registration_date = models.DateTimeField(auto_now_add=True)
+
+class RegistrationRecord(models.Model):
+
+    # Columns / Fields
+    
+    # User Information Not Necessary, if user deleted then record should be deleted
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE)
+    
+    # The specific event instance information
+    registration_id = models.IntegerField()
+    event_id = models.ForeignKey(EventInstance, on_delete=models.CASCADE)
+    event_date = models.DateTimeField()
+    
+    # Registration information
+    registration_date = models.DateTimeField()
+    day = models.CharField(max_length=20, default=datetime.datetime.now().strftime("%A"))
+    session = models.CharField(max_length=20)
+    
+    # The events information
+    template_id = models.IntegerField()
+    schedule_id = models.IntegerField()
+    event_name = models.CharField(max_length=30)
+    gender = models.CharField(max_length=40)
+    year_group = models.IntegerField()
+    maximum_capacity = models.IntegerField()
+
+    creation_date = models.DateTimeField(auto_now_add=True)
+
+    # e.g. 1 18 Monday Morning 14 19  20 Basketball Boys 12 
+    # 1: Jasiri Wa-kyendo and if this accountis deleted then all my RegistrationRecords should be deleted through on_delete=models.CASCADE 
+    

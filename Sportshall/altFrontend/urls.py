@@ -14,8 +14,8 @@ urlpatterns = [
     path('create-event/', newEvent),
 
     path('schedule/', scheduleView),
-    path('edit-schedule/', editScheduleView),
 
+    path('settings/', settingsView, name="settings"),
 ]
 
 

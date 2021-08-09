@@ -212,9 +212,7 @@ def addEventToSchedule(request, *args, **kwargs ):
 #####################################################################
 
 def scheduleView(request, *args, **kwargs ):
-    
-
-    
+        
     eventTemplates = {}
     for event in EventTemplate.objects.all():
         eventTemplates[event.template_id] = event.__dict__
@@ -404,3 +402,56 @@ def addName(request, *artgs,**kwargs):
     '''newStudent = Student(student_first_name="Jasiri", student_last_name="Mumina Wa-Kyendo",boarding_house = "TS", year_group=12, gender="Male")
     newStudent.save'''
     return render(request, 'frontend/sheet.html')
+
+######################################################################]
+
+def settingsView(request, *args, **kwargs):
+
+    genders = []
+    for g in range(len(Student.GENDERS)):
+        genders.append(Student.GENDERS[g][1])
+    
+    boardinghouses = []
+    for b in range(len(Student.BOARDINGHOUSES)):
+        boardinghouses.append(Student.BOARDINGHOUSES[b][1])
+    
+    yeargroups = []
+    for year in Student.YEARGROUPS:
+        yeargroups.append(year.value)
+
+    student = Student.objects.get(user_id_id = request.user.id) if Student.objects.filter(user_id_id = request.user.id).exists() else ""
+    
+    context = {
+        "Genders" : genders,
+        "BoardingHouses" : boardinghouses,
+        "YearGroups" : yeargroups,
+        "student" : student,
+    }
+
+    if request.method == 'POST':
+        if not Student.objects.filter(user_id = request.POST['userID']).exists():
+            newStudent = Student(
+                user_id_id = request.POST['userID'],
+                student_first_name = request.POST['firstname'],
+                student_last_name = request.POST['lastname'],
+                boarding_house = request.POST['bhouse'],
+                year_group = request.POST['yeargroup'],
+                gender = request.POST['gender']
+            )
+            newStudent.save()
+            context["Message"] = "Succesfully created your account"
+        else:
+            Student.objects.filter(user_id = request.POST['userID']).update(
+                user_id = request.POST['userID'],
+                student_first_name = request.POST['firstname'],
+                student_last_name = request.POST['lastname'],
+                boarding_house = request.POST['bhouse'],
+                year_group = request.POST['yeargroup'],
+                gender = request.POST['gender']
+            )
+            context["Message"] = "Sucessfully updated your details"
+
+    
+
+
+    return render(request, 'frontend/settings.html', context)

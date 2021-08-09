@@ -64,6 +64,41 @@ a:visited {
 	color: hotpink;
 }
 
+.tab{
+	padding: 16px 20px;
+	border-radius: 10px;
+	transition: 0.3s ease-in-out;
+}
+.tab:hover{
+	cursor: pointer;
+	padding-left: 24px;
+}
+.tab.active{
+	padding-left: 24px;
+	border-radius: 10px;
+	border-bottom-right-radius: 0px;
+	border-top-right-radius: 0px;
+	border-right: none;
+	box-shadow: -8px 0px 15px -6px #33b;
+}
+.tab-content-container{
+	padding-left: 60px;
+	flex:80%;
+}
+
+.tab-content{
+	display:none;
+}
+.tab-content.active{
+	display: block;
+}
+
+input{
+	margin-left: 8px;
+	border: none;
+	border-bottom: 2px #888 solid;
+}
+
 .view-list{
 	transition: padding-left 0.5s ease-in-out;
 }

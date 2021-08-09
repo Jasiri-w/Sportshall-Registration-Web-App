@@ -1,3 +1,20 @@
+function openTab(el){
+    console.log("Open Tab")
+    contentTabs = document.querySelectorAll(".tab-content");
+    tabs = document.querySelectorAll(".tab");
+    for(var x = 0; x < contentTabs.length; x++){
+        contentTabs[x].classList.remove("active");
+    }
+    for(var x = 0; x < tabs.length; x++){
+        tabs[x].classList.remove("active");
+    }
+
+    query = ".tab-content[name = '" + el.getAttribute("name") + "']";
+    document.querySelector(query).classList.add("active");
+
+    el.classList.add("active");
+}
+
 window.addEventListener("load", () => {
     document.querySelector("body").classList.add("loaded");
 })
