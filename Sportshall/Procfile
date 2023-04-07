@@ -1,1 +1,1 @@
-web: gunicorn Sportshall.wsgi --log-file
+web: gunicorn Sportshall.wsgi --log-file -
