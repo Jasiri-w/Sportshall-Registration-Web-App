@@ -1,1 +1,1 @@
-web: python manage.py collectstatic && python manage.py migrate && gunicorn Sportshall.wsgi --log-file -
+web: python manage.py collectstatic --noinput && python manage.py migrate && gunicorn Sportshall.wsgi --log-file -
