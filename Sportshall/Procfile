@@ -1,1 +1,1 @@
-web: gunicorn Sportshall.wsgi --log-file -
+web: python manage.py migrate && gunicorn Sportshall.wsgi --log-file -
