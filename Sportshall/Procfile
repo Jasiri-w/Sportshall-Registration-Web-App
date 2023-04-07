@@ -1,1 +1,1 @@
-web: gunivorn Sportshal.wsgi --log-file
+web: gunicorn Sportshal.wsgi --log-file
