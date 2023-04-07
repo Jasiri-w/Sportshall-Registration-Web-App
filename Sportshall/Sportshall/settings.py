@@ -27,7 +27,7 @@ SECRET_KEY = 'eubt9u$&7nm7*ri6!d^rqjwrs&w%zb^o1-ri6ms2dte+&hzs3y'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", getIP(), "0.0.0.0"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", getIP(), "0.0.0.0","*"]
 
 ACCOUNT_SIGNUP_REDIRECT_URL = "/student/"
 LOGIN_REDIRECT_URL = "home"
@@ -164,10 +164,12 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '.static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
-    'frontend/templates/build',
-    'altFrontend/templates/build'
+    'frontend/static',
+    #'frontend/templates/build',
+    'altFrontend/static'
+    #'altFrontend/templates/build'
 ]
 
 ####### django-microsoft-auth 1st Try

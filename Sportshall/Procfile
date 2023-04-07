@@ -1,0 +1,1 @@
+web: gunivorn Sportshal.wsgi --log-file

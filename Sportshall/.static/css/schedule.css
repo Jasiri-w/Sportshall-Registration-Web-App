@@ -1,0 +1,120 @@
+#scheduleContainer {
+    width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	padding: 4rem 0;
+	font-family: -system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+table {
+    width: 100%;
+}
+
+.tableContainer {
+    max-width: 100%;
+    overflow-x:auto;
+}
+
+@media print{
+    .tableContainer {
+        max-width: 100%;
+        overflow-x: visible;
+    }
+}
+
+table tr:nth-child(odd) th {
+    color: #ccc;
+    font-weight: normal;
+}
+table th, table td {
+    padding: 0.5rem 1rem;
+}
+table th {
+    font-weight: normal;
+    border-top: thin dotted #ccc;
+}
+table td {
+    font-size: 0.8rem;
+    font-weight: bold;
+    line-height: 1.4;
+    border-radius: 0.2rem;
+    transition: opacity 0.3s ease;
+}
+table td > span {
+    font-size: 0.8em;
+    font-weight: normal;
+    display: block;
+    width: 100%;
+}
+
+.cellcontent{
+    margin: 5px 0;
+    padding: 1.2rem 1.2rem;
+    box-sizing: border-box;
+    text-align: justify;
+    border-radius: 0.2rem;
+    width: 100%;
+}
+
+.cellcontent[draggable = "True"]:hover{
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+
+
+.cellcontent[draggable = "True"]:active{
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+}
+
+.cellcontent[draggable = "True"]:hover .cellcontent::before {
+    cursor: pointer;
+    color: white;
+    content: '\00d7';
+    /* color: #fff; */
+    font-weight: 300;
+    position: relative;
+    top: 3px;
+}
+
+.cellcontent.edit{
+    margin: 0.2rem;
+}
+
+.cellcontent p{
+    font-size: 0.8rem;
+}
+
+.cellcontent span{
+    font-weight: 200;
+}
+
+.over {
+    border: 3px dotted #666;
+    padding-bottom: 5rem;
+}
+
+[data-color="orange"] {background-color: #FFA726;}
+[data-color="green"] {background-color: #9CCC65;}
+[data-color="red"] {background-color: #FF8A65;}
+[data-color="cyan"] {background-color: #B3E5FC;}
+[data-color="light-blue"]{background-color: #81D4FA;}
+[data-color="blue"] {background-color: #26C6DA;}
+
+#saveTableButtonDiv {
+    position: sticky;
+    top: 10%;
+}
+
+#saveTableForm, .save-schedule-btn, .clearbtn{
+    display: inline-block;
+}
+
+button:hover{
+	border: 2px solid hotpink;
+	background: none;
+	color: black;
+}
