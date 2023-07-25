@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", getIP(), "0.0.0.0",".vercel.app"]
 ACCOUNT_SIGNUP_REDIRECT_URL = "/student/"
 LOGIN_REDIRECT_URL = "home"
 
-CSRF_TRUSTED_ORIGINS = ["https://sportshall-registration-web-app.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = [".vercel.app"]
 
 # Application definition
 
