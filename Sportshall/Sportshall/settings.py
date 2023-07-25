@@ -27,7 +27,7 @@ SECRET_KEY = 'eubt9u$&7nm7*ri6!d^rqjwrs&w%zb^o1-ri6ms2dte+&hzs3y'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", getIP(), "0.0.0.0","*"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", getIP(), "0.0.0.0",".vercel.app"]
 
 ACCOUNT_SIGNUP_REDIRECT_URL = "/student/"
 LOGIN_REDIRECT_URL = "home"
