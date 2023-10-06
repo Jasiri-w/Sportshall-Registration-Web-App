@@ -15,6 +15,7 @@ cryptography==40.0.1
 debugpy==1.6.3
 decorator==5.1.1
 defusedxml==0.7.1
+dnspython==2.4.2
 Django==4.2
 django-allauth==0.54.0
 djangorestframework==3.14.0
@@ -43,6 +44,7 @@ pure-eval==0.2.2
 pycparser==2.21
 Pygments==2.13.0
 PyJWT==2.6.0
+pymongo==4.5.0
 pyparsing==3.0.9
 pyrsistent==0.18.1
 python-dateutil==2.8.2
@@ -63,6 +65,7 @@ tinycss2==1.1.1
 tomli==2.0.1
 tornado==6.2
 traitlets==5.4.0
+typing-extensions==4.8.0
 tzdata==2023.3
 urllib3==1.26.12
 wcwidth==0.2.5
