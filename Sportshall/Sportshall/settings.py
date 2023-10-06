@@ -119,10 +119,20 @@ WSGI_APPLICATION = 'Sportshall.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
+
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'local',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': 'mongodb+srv://admin:b3yJuzuY5yCzKmwy@octobersveryown.0oz4zzg.mongodb.net/'
+        }
     }
+
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
 }
 
 
