@@ -7,12 +7,18 @@ node_modules/
 __pycache__
 db.sqlite3
 media
+.env
 
 # Backup files # 
 *.bak 
 
 # Python # 
 *$py.class 
+
+# Virtual environment files
+venv/           # For a directory named 'venv'
+env/            # For a directory named 'env'
+.venv/          # For a directory named '.venv'
 
 # Distribution / packaging 
 .Python build/ 
