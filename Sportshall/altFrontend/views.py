@@ -192,15 +192,15 @@ def homeView(request, *args, **kwargs):
         year_group,
         maximum_capacity
     FROM
-        altFrontend_eventinstance
+        public."altFrontend_eventinstance"
     JOIN
-        altFrontend_schedule
+        public."altFrontend_schedule"
     ON
-        altFrontend_schedule.schedule_id = altFrontend_eventinstance.schedule_id_id
+        public."altFrontend_schedule".schedule_id = public."altFrontend_eventinstance".schedule_id_id
     JOIN
-        altFrontend_eventtemplate
+        public."altFrontend_eventtemplate"
     ON
-        altFrontend_eventtemplate.template_id = altFrontend_schedule.template_id_id;
+        public."altFrontend_eventtemplate".template_id = public."altFrontend_schedule".template_id_id;
 '''
 
     
