@@ -5,8 +5,8 @@ pip install -r requirements.txt
 python3.9 manage.py migrate
 
 # Check if the superuser already exists
-if [ -z "$(python3.9 manage.py shell -c 'from django.contrib.auth.models import User; print(User.objects.filter(username=os.environ["DJANGO_SUPERUSER_USERNAME"]).exists())')" ]; then
-    # Superuser doesn't exist, create one
+if [ "$(python3.9 manage.py shell -c "import os;from django.contrib.auth.models import User; print(User.objects.filter(username=os.environ['DJANGO_SUPERUSER_USERNAME']).exists())")" = "False" ]; then
+     # Superuser doesn't exist, create one
     echo "Creating superuser..."
     python3.9 manage.py createsuperuser --no-input
 else
