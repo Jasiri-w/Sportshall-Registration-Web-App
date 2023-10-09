@@ -14,6 +14,9 @@ from pathlib import Path
 from .globalscripts import *
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -32,7 +35,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", getIP(), "0.0.0.0",".vercel.app"]
 ACCOUNT_SIGNUP_REDIRECT_URL = "/student/"
 LOGIN_REDIRECT_URL = "home"
 
-CSRF_TRUSTED_ORIGINS = [".vercel.app"]
+CSRF_TRUSTED_ORIGINS = ["https://*.vercel.app"]
 
 # Application definition
 
@@ -68,6 +71,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'Sportshall.urls'
@@ -120,10 +124,19 @@ WSGI_APPLICATION = 'Sportshall.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get("POSTGRES_DATABASE"),
+        'USER': os.environ.get("POSTGRES_USER"),
+        'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+        'HOST': os.environ.get("POSTGRES_HOST"),
     }
+
+    #'default': {
+    #    'ENGINE': '',
+    # 'NAME': BASE_DIR / 'db.sqlite3',
+    #   }
 }
+
 
 
 # Password validation
@@ -165,7 +178,7 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles', 'static')
 STATICFILES_DIRS = [
     'frontend/static',
     #'frontend/templates/build',

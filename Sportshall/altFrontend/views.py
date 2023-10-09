@@ -94,9 +94,82 @@ def sheetView(request, event_id_id_id, *args, **kwargs):
                     print(Student.objects.get(user_id_id = y.user_id_id).student_first_name, " did not survive the purge.")
 
 
-    RegQuery = f"SELECT registration_id, event_name, event_date, schedule_id, template_id, student_id, first_name, last_name, id, session, day, student_first_name, student_last_name, altFrontend_student.gender AS student_gender, altFrontend_student.year_group AS year_group, boarding_house, altFrontend_student.user_id_id FROM altFrontend_registration JOIN altFrontend_eventinstance ON event_id = event_id_id JOIN altFrontend_schedule ON schedule_id_id = schedule_id JOIN altFrontend_eventtemplate ON template_id = template_id_id JOIN auth_user ON auth_user.id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = altFrontend_registration.user_id_id WHERE event_id = { event_id_id_id };"
-    StudentQuery = f"SELECT * FROM altFrontend_student WHERE gender =  '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).gender }' AND year_group =  '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).year_group }' "
-    EventQuery = f"SELECT event_id, event_date, session, day, event_name, gender, maximum_capacity, year_group  FROM altFrontend_eventinstance JOIN altFrontend_schedule ON schedule_id = schedule_id_id JOIN altFrontend_eventtemplate ON template_id = template_id_id WHERE event_id = { event_id_id_id };"
+    RegQuery = f'''
+    SELECT
+        registration_id,
+        event_name,
+        event_date,
+        schedule_id,
+        template_id,
+        student_id,
+        first_name,
+        last_name,
+        id,
+        session,
+        day,
+        student_first_name,
+        student_last_name,
+        altFrontend_student.gender AS student_gender,
+        altFrontend_student.year_group AS year_group,
+        boarding_house,
+        altFrontend_student.user_id_id
+    FROM
+        public."altFrontend_registration"
+    JOIN
+        public."altFrontend_eventinstance"
+    ON
+        event_id = event_id_id
+    JOIN
+        public."altFrontend_schedule"
+    ON
+        schedule_id_id = schedule_id
+    JOIN
+        public."altFrontend_eventtemplate"
+    ON
+        template_id = template_id_id
+    JOIN
+        auth_user
+    ON
+        auth_user.id = altFrontend_registration.user_id_id
+    JOIN
+        altFrontend_student
+    ON
+        altFrontend_student.user_id_id = altFrontend_registration.user_id_id
+    WHERE
+        event_id = {event_id_id_id};
+'''
+    StudentQuery = f'''
+    SELECT
+        *
+    FROM
+        public."altFrontend_student"
+    WHERE
+        gender = '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).gender}'
+        AND year_group = '{EventTemplate.objects.get(template_id = Schedule.objects.get(schedule_id = EventInstance.objects.get(event_id = event_id_id_id).schedule_id_id).template_id_id).year_group}';
+'''
+    EventQuery = f'''
+    SELECT
+        event_id,
+        event_date,
+        session,
+        day,
+        event_name,
+        gender,
+        maximum_capacity,
+        year_group
+    FROM
+        public."altFrontend_eventinstance"
+    JOIN
+        public."altFrontend_schedule"
+    ON
+        schedule_id = schedule_id_id
+    JOIN
+        public."altFrontend_eventtemplate"
+    ON
+        template_id = template_id_id
+    WHERE
+        event_id = {event_id_id_id};
+'''
     students = {}
     for el in Student.objects.raw(str(StudentQuery)):
         #print("El: ", el)
@@ -156,7 +229,55 @@ def homeView(request, *args, **kwargs):
 
     # Upcoming events such as tonights basketball or tommorrow mornings squash
     upcomingevents = []
-    equery = f"select event_id, schedule_id_id, session, day, template_id, event_name, gender, year_group, maximum_capacity from altFrontend_eventinstance join altFrontend_schedule on altFrontend_schedule.schedule_id = altFrontend_eventinstance.schedule_id_id join altFrontend_eventtemplate on altFrontend_eventtemplate.template_id = altFrontend_schedule.template_id_id where gender = '{ Student.objects.get(user_id_id = request.user.id).gender }' and year_group = { Student.objects.get(user_id_id = request.user.id).year_group } ;" if request.user != None and Student.objects.filter(user_id_id = request.user.id).exists() else "select event_id, schedule_id_id, session, day, template_id, event_name, gender, year_group, maximum_capacity from altFrontend_eventinstance join altFrontend_schedule on altFrontend_schedule.schedule_id = altFrontend_eventinstance.schedule_id_id join altFrontend_eventtemplate on altFrontend_eventtemplate.template_id = altFrontend_schedule.template_id_id;"
+    equery = f'''
+    SELECT
+        event_id,
+        schedule_id_id,
+        session,
+        day,
+        template_id,
+        event_name,
+        gender,
+        year_group,
+        maximum_capacity
+    FROM
+        public."altFrontend_eventinstance"
+    JOIN
+        public."altFrontend_schedule"
+    ON
+        public."altFrontend_schedule".schedule_id = public."altFrontend_eventinstance".schedule_id_id
+    JOIN
+        public."altFrontend_eventtemplate"
+    ON
+        public."altFrontend_eventtemplate".template_id = public."altFrontend_schedule".template_id_id
+    WHERE
+        gender = '{ Student.objects.get(user_id_id = request.user.id).gender }'
+        AND year_group = { Student.objects.get(user_id_id = request.user.id).year_group }
+''' if request.user != None and Student.objects.filter(user_id_id = request.user.id).exists() else '''
+    SELECT
+        event_id,
+        schedule_id_id,
+        session,
+        day,
+        template_id,
+        event_name,
+        gender,
+        year_group,
+        maximum_capacity
+    FROM
+        public."altFrontend_eventinstance"
+    JOIN
+        public."altFrontend_schedule"
+    ON
+        public."altFrontend_schedule".schedule_id = public."altFrontend_eventinstance".schedule_id_id
+    JOIN
+        public."altFrontend_eventtemplate"
+    ON
+        public."altFrontend_eventtemplate".template_id = public."altFrontend_schedule".template_id_id;
+'''
+
+    
+
     querySet = EventInstance.objects.raw(equery)
     for event in querySet :
         #print(event.event_date.day - datetime.datetime.now().day)
@@ -166,7 +287,7 @@ def homeView(request, *args, **kwargs):
     # Queries the Registration table for the current users registrations: all the events the user is signed up for 
     userEvents = {}
     if request.user.id != None:
-        userEventsQuery = f"SELECT registration_id, event_id_id, registration_date, student_first_name, student_last_name, boarding_house, year_group, gender, altFrontend_student.user_id_id FROM altFrontend_registration JOIN auth_user ON id = altFrontend_registration.user_id_id JOIN altFrontend_student ON altFrontend_student.user_id_id = id WHERE altFrontend_student.user_id_id = { request.user.id };"
+        userEventsQuery = f'SELECT registration_id, event_id_id, registration_date, student_first_name, student_last_name, boarding_house, year_group, gender, public."altFrontend_student".user_id_id FROM public."altFrontend_registration" JOIN public."auth_user" ON id = public."altFrontend_registration".user_id_id JOIN public."altFrontend_student" ON public."altFrontend_student".user_id_id = id WHERE public."altFrontend_student".user_id_id = { request.user.id };'
         userEventsQuerySet = Registration.objects.raw(userEventsQuery)
         for event in userEventsQuerySet:
             userEvents[event.registration_id] = event.__dict__
