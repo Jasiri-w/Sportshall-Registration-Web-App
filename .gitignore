@@ -16,9 +16,9 @@ media
 *$py.class 
 
 # Virtual environment files
-venv/           # For a directory named 'venv'
-env/            # For a directory named 'env'
-.venv/          # For a directory named '.venv'
+venv/
+env/
+.venv/
 
 # Distribution / packaging 
 .Python build/ 
