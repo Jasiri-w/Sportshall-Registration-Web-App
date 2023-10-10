@@ -11,7 +11,7 @@ This Web Application is a dashboard for **Registering** for, **Scheduling** and 
  * [View Gallery](#Views)
 
 ## Info
-Live @ : https://sportshall-registration-web-app.vercel.app/schedule/
+Live @ : https://sportshall-registration-web-app.vercel.app
 
 This app is made with:
  * Django <a href="https://www.djangoproject.com/" title="Django"><img src="https://github.com/get-icon/geticon/raw/master/icons/django.svg" alt="Django" width="21px" height="21px"></a>
