@@ -230,9 +230,9 @@ def homeView(request, *args, **kwargs):
     # Upcoming events such as tonights basketball or tommorrow mornings squash
     upcomingevents = []
 
-    currentUser = User.objects.get(pk=request.user.pk)
-    genderFilter = f"gender = '{ Student.objects.get(user_id_id = request.user.id).gender }'" if not currentUser.is_superuser else "TRUE"
-    yearGroupFilter = f"year_group = { Student.objects.get(user_id_id = request.user.id).year_group }" if not currentUser.is_superuser else "TRUE"
+    currentUser = User.objects.get(pk=request.user.pk) if request.user != None else None
+    genderFilter = f"gender = '{ Student.objects.get(user_id_id = request.user.id).gender }'" if not currentUser.is_superuser and request.user != None else "TRUE"
+    yearGroupFilter = f"year_group = { Student.objects.get(user_id_id = request.user.id).year_group }" if not currentUser.is_superuser and request.user != None else "TRUE"
     equery = f'''
     SELECT
         event_id,
