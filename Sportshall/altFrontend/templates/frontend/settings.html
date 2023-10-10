@@ -14,15 +14,14 @@
         <div class="tab active" name="account" onclick="openTab(this)">Account</div>
         <div class="tab" name="look-feel" onclick="openTab(this)">Look and Feel</div>
         <div class="tab" name="history" onclick="openTab(this)">History</div>
-        <div class="tab" name="set4" onclick="openTab(this)">Setting 4</div>
     </div>
     <div class="tab-content-container">
         <div class="tab-content active" name="account">
             <form action="" method="post" id="studentForm">
                 {% csrf_token %}
                 <input type="hidden" value="{{ user.id}}" name="userID">
-                <p><em><strong>First Name</strong></em> <input type="text" name="firstname" id="firstname" value="{{student.student_first_name}}" required></input></p>
-                <p><em><strong>Last Name</strong></em> <input type="text" name="lastname" id="lastname" value="{{student.student_last_name}}" required></input></p>
+                <p><em><strong>First Name</strong></em> <input type="text" name="firstname" id="firstname" value="{{user.first_name}}" required></input></p>
+                <p><em><strong>Last Name</strong></em> <input type="text" name="lastname" id="lastname" value="{{user.last_name}}" required></input></p>
                 <p><em><strong>Boarding House</strong></em> <input list="bhouses" name="bhouse" id="bhouse" value="{{student.boarding_house}}" required/></p>
                 <datalist id="bhouses">
                     {% for house in BoardingHouses %}
@@ -48,7 +47,6 @@
         </div>
         <div class="tab-content" name="look-feel"><p>Theme Come Soon</p></div>
         <div class="tab-content" name="history"></div>
-        <div class="tab-content" name="set4"></div>
     </div>
 {% endblock container %}
 
