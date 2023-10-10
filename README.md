@@ -1,11 +1,19 @@
 # Sportshall-Registration-Web-App
 This Web Application is a dashboard for **Registering** for, **Scheduling** and **Managing** School Sports & Entertainment activities.
+ * [About](#Info)
+ * [Preview Accounts](#Accounts)
+ * [View Gallery](#Views)
 
+## Info
 Live @ : https://sportshall-registration-web-app.vercel.app/schedule/
 
-This Project Uses Django , HTML, CSS & JavaScript
+This app is made with:
+ * Django
+ * HTML
+ * CSS
+ * JavaScript
 
-## Accounts for testing:
+## Accounts for Previewing
 1. User Test
 
 **Username**: "Test" **Password**: "aEXrFBAE9xUc8qg"
