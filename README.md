@@ -1,4 +1,10 @@
 # Sportshall-Registration-Web-App
+<a href="https://www.djangoproject.com/" title="Django"><img src="https://github.com/get-icon/geticon/raw/master/icons/django.svg" alt="Django" width="21px" height="21px"></a>
+<a href="https://www.w3.org/TR/html5/" title="HTML5"><img src="https://github.com/get-icon/geticon/raw/master/icons/html-5.svg" alt="HTML5" width="21px" height="21px"></a>
+<a href="https://www.w3.org/TR/CSS/" title="CSS3"><img src="https://github.com/get-icon/geticon/raw/master/icons/css-3.svg" alt="CSS3" width="21px" height="21px"></a>
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" title="JavaScript"><img src="https://github.com/get-icon/geticon/raw/master/icons/javascript.svg" alt="JavaScript" width="21px" height="21px"></a>
+<a href="https://www.postgresql.org/" title="PostgreSQL"><img src="https://github.com/get-icon/geticon/raw/master/icons/postgresql.svg" alt="PostgreSQL" width="21px" height="21px"></a>
+
 This Web Application is a dashboard for **Registering** for, **Scheduling** and **Managing** School Sports & Entertainment activities.
  * [About](#Info)
  * [Preview Accounts](#Accounts)
@@ -8,10 +14,11 @@ This Web Application is a dashboard for **Registering** for, **Scheduling** and 
 Live @ : https://sportshall-registration-web-app.vercel.app/schedule/
 
 This app is made with:
- * Django
- * HTML
- * CSS
- * JavaScript
+ * Django <a href="https://www.djangoproject.com/" title="Django"><img src="https://github.com/get-icon/geticon/raw/master/icons/django.svg" alt="Django" width="21px" height="21px"></a>
+ * Postgresql <a href="https://www.postgresql.org/" title="PostgreSQL"><img src="https://github.com/get-icon/geticon/raw/master/icons/postgresql.svg" alt="PostgreSQL" width="21px" height="21px"></a>
+ * HTML <a href="https://www.w3.org/TR/html5/" title="HTML5"><img src="https://github.com/get-icon/geticon/raw/master/icons/html-5.svg" alt="HTML5" width="21px" height="21px"></a>
+ * CSS <a href="https://www.w3.org/TR/CSS/" title="CSS3"><img src="https://github.com/get-icon/geticon/raw/master/icons/css-3.svg" alt="CSS3" width="21px" height="21px"></a>
+ * JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" title="JavaScript"><img src="https://github.com/get-icon/geticon/raw/master/icons/javascript.svg" alt="JavaScript" width="21px" height="21px"></a>
 
 ## Accounts
 1. User Test
@@ -41,3 +48,5 @@ Admin Schedule View
 Registration Sheet
 ![Screenshot 2023-10-10 111804](https://github.com/Jasiri-w/Sportshall-Registration-Web-App/assets/6060064/5887b64c-79e5-426e-afd6-92cf13438afa)
 
+
+Icons Courtesy of https://github.com/get-icon/geticon
