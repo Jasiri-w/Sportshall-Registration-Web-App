@@ -62,7 +62,7 @@
         {% block topbar %}
         
             {% if user.is_authenticated %}
-                <em>Hi, Welcome back</em> <strong>{{ user.first_name }}</strong> !
+                <em>Hi, Welcome back</em> <strong>{{ user.first_name }} {{ user.last_name }}</strong> !
                 <p style="text-align:end;"><a href="{% url 'account_logout' %}">Log Out</a></p>
             {% else %}
                 <p>You are not logged in</p>

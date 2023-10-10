@@ -30,8 +30,9 @@ Home
                     <h3>{{event.event_name}}</h3>
                     <p>{{event.gender}}</p>
                     <p>Year {{event.year_group}}</p>
-                    <form action="/add-event-to-today/" method="post">
-                        <input type="submit"  id="addButton" class="addBtn" value="Add Activity"></input>
+                    <form action="/add-event-to-today/{{event.template_id}}" method="post">
+                        {% csrf_token %}
+                        <input type="submit"  id="addButton" class="addBtn" value="Schedule Today"></input>
                     </form>
                 </div>
             {%empty%}

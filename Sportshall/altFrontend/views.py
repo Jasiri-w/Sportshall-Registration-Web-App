@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.conf import settings
 
 from .models import Student, EventTemplate, EventInstance, Registration, Schedule  
@@ -109,10 +109,10 @@ def sheetView(request, event_id_id_id, *args, **kwargs):
         day,
         student_first_name,
         student_last_name,
-        altFrontend_student.gender AS student_gender,
-        altFrontend_student.year_group AS year_group,
+        public."altFrontend_student".gender AS student_gender,
+        public."altFrontend_student".year_group AS year_group,
         boarding_house,
-        altFrontend_student.user_id_id
+        public."altFrontend_student".user_id_id
     FROM
         public."altFrontend_registration"
     JOIN
@@ -130,11 +130,11 @@ def sheetView(request, event_id_id_id, *args, **kwargs):
     JOIN
         auth_user
     ON
-        auth_user.id = altFrontend_registration.user_id_id
+        auth_user.id = public."altFrontend_registration".user_id_id
     JOIN
-        altFrontend_student
+        public."altFrontend_student"
     ON
-        altFrontend_student.user_id_id = altFrontend_registration.user_id_id
+        public."altFrontend_student".user_id_id = public."altFrontend_registration".user_id_id
     WHERE
         event_id = {event_id_id_id};
 '''
@@ -211,7 +211,7 @@ def homeView(request, *args, **kwargs):
     if  request.method == 'POST':
         if request.POST["postIntent"] =="Leave":
             Registration.objects.filter(event_id = request.POST['eventID']).filter(user_id = request.user.id).delete()
-            response = "<span style='color: green;'><em>Succesfully left "+ str(EventTemplate.objects.get(template_id = Schedule.objects.get(eventinstance = EventInstance.objects.get(event_id = 32)).template_id_id).event_name) +"</em></span>"
+            response = "<span style='color: green;'><em>Unregistered Succesfully for "+ str(EventTemplate.objects.get(template_id = Schedule.objects.get(eventinstance = EventInstance.objects.get(event_id = request.POST['eventID'])).template_id_id).event_name) +"</em></span>"
         elif request.POST["postIntent"] == "Sign-Up":
             # Checks to see if a Registration table entry already exists with both the specific event ( which changes every new time the event comes) and linked to the user    
             if not Registration.objects.filter(event_id = request.POST['eventID']).filter(user_id = request.POST['userID']).exists():
@@ -222,13 +222,17 @@ def homeView(request, *args, **kwargs):
                     user_id_id = request.POST['userID'],
                 )
                 newRegistration.save()
-                response = "<span style='color: green;'><em>Signed Up Successfully</em></span>"
+                response = f"<span style='color: green;'><em>Register Successfully for {str(EventTemplate.objects.get(template_id = Schedule.objects.get(eventinstance = EventInstance.objects.get(event_id = request.POST['eventID'])).template_id_id).event_name) } </em></span>"
             else:
                 # If the user is already registered write this at the top of the page
                 response = "<span style='color: red;'><em>You are already signed up for this activity</em></span>"
 
     # Upcoming events such as tonights basketball or tommorrow mornings squash
     upcomingevents = []
+
+    currentUser = User.objects.get(pk=request.user.pk)
+    genderFilter = f"gender = '{ Student.objects.get(user_id_id = request.user.id).gender }'" if not currentUser.is_superuser else "TRUE"
+    yearGroupFilter = f"year_group = { Student.objects.get(user_id_id = request.user.id).year_group }" if not currentUser.is_superuser else "TRUE"
     equery = f'''
     SELECT
         event_id,
@@ -251,8 +255,8 @@ def homeView(request, *args, **kwargs):
     ON
         public."altFrontend_eventtemplate".template_id = public."altFrontend_schedule".template_id_id
     WHERE
-        gender = '{ Student.objects.get(user_id_id = request.user.id).gender }'
-        AND year_group = { Student.objects.get(user_id_id = request.user.id).year_group }
+        ''' + genderFilter + '''
+        AND ''' + yearGroupFilter + '''
 ''' if request.user != None and Student.objects.filter(user_id_id = request.user.id).exists() else '''
     SELECT
         event_id,
@@ -281,7 +285,7 @@ def homeView(request, *args, **kwargs):
     querySet = EventInstance.objects.raw(equery)
     for event in querySet :
         #print(event.event_date.day - datetime.datetime.now().day)
-        if event.event_date.day - datetime.datetime.now().day <= 1:
+        if event.event_date.day - datetime.datetime.now().day <= 2:
             upcomingevents.append(event)
 
     # Queries the Registration table for the current users registrations: all the events the user is signed up for 
@@ -315,20 +319,6 @@ def homeView(request, *args, **kwargs):
     context["JSON"] = dumps(context, default=str)
 
     return render(request, 'frontend/home.html', context)
-
-def addEventToSchedule(request, *args, **kwargs ):
-
-    newScheduleElement = Schedule(
-        event_name= request.POST['eventname'],
-        gender = request.POST['gender'],
-
-        session = request.POST['session'],
-        day = datetime.datetime.now().strftime("%A"),
-        template_id_id = request.POST['template_id']
-    )
-    newScheduleElement.save()
-    context ={}
-    return render(request, 'frontend/home.html', context )
 
 #####################################################################
 
@@ -468,7 +458,7 @@ def newStudent(request, *args, **kwargs):
 
 #####################################################################
 
-def createEventView(request, *args, **kwargs):
+def editEventView(request, *args, **kwargs):
     genders = []
     for g in range(len(Student.GENDERS)):
         genders.append(Student.GENDERS[g][1])
@@ -488,14 +478,26 @@ def createEventView(request, *args, **kwargs):
 
     return render(request, 'frontend/create/event.html', context)
 
-def newEvent(request, *args, **kwargs):
+def createEvent(request, *args, **kwargs):
     
     events = []
     for event in EventInstance.objects.all():
         if event.event_date == datetime.datetime.now():
             events.append(event.event_name)
 
+        genders = []
+    for g in range(len(Student.GENDERS)):
+        genders.append(Student.GENDERS[g][1])
+
+    yeargroups = []
+    for year in Student.YEARGROUPS:
+        yeargroups.append(year.value)
+    
     context = {
+        "YearGroups" : yeargroups,
+        "Genders" : genders,
+        "Schedule" : [ event for event in Schedule.objects.all()],
+        "AllEventTemplates" : EventTemplate.objects.all(),
         "Valid" :   False,
         "Message" : "Already Exists"
     }
@@ -509,11 +511,9 @@ def newEvent(request, *args, **kwargs):
             maximum_capacity = request.POST['maxcap'],
         )
         newEventTemplate.save()
-        context = {
-            "Valid" :   True,
-            "Message" : "",
-        }
 
+        context["Valid"] = True
+        context["Message"] = ""
 
     return render(request, 'frontend/create/event.html', context)
 
@@ -524,7 +524,7 @@ def addName(request, *artgs,**kwargs):
     newStudent.save'''
     return render(request, 'frontend/sheet.html')
 
-######################################################################]
+######################################################################
 
 def settingsView(request, *args, **kwargs):
 
@@ -572,7 +572,30 @@ def settingsView(request, *args, **kwargs):
             )
             context["Message"] = "Sucessfully updated your details"
 
-    
+        currentUser = User.objects.get(pk=request.user.pk)
+        currentUser.first_name = request.POST['firstname']
+        currentUser.last_name = request.POST['lastname']
+        currentUser.save()
 
 
     return render(request, 'frontend/settings.html', context)
+
+
+######################################################################]
+
+def getCurrentSession():
+    noonTime = datetime.time(13, 0, 0)
+    return "Morning" if datetime.datetime.now().time() < noonTime else "Evening"
+
+def addEventToTodayView(request, event_id_id_id, *args, **kwargs):
+
+    context = {}
+
+    newScheduleEntity= Schedule(
+        session = getCurrentSession(),
+        day = datetime.datetime.now().strftime("%A"),
+        template_id_id = event_id_id_id,
+    )
+    newScheduleEntity.save()
+
+    return redirect("home")
