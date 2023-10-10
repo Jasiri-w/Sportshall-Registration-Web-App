@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'eubt9u$&7nm7*ri6!d^rqjwrs&w%zb^o1-ri6ms2dte+&hzs3y'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", getIP(), "0.0.0.0",".vercel.app"]
 
