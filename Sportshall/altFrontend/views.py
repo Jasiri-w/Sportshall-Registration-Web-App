@@ -222,7 +222,7 @@ def homeView(request, *args, **kwargs):
                     user_id_id = request.POST['userID'],
                 )
                 newRegistration.save()
-                response = f"<span style='color: green;'><em>Register Successfully for {str(EventTemplate.objects.get(template_id = Schedule.objects.get(eventinstance = EventInstance.objects.get(event_id = request.POST['eventID'])).template_id_id).event_name) } </em></span>"
+                response = f"<span style='color: green;'><em>Registered Successfully for {str(EventTemplate.objects.get(template_id = Schedule.objects.get(eventinstance = EventInstance.objects.get(event_id = request.POST['eventID'])).template_id_id).event_name) } </em></span>"
             else:
                 # If the user is already registered write this at the top of the page
                 response = "<span style='color: red;'><em>You are already signed up for this activity</em></span>"
@@ -457,7 +457,7 @@ def newStudent(request, *args, **kwargs):
         )
         context = {
             "Valid" : True,
-            "Message": "Sucessfully updated your details"
+            "Message": "Successfully updated your details"
         }
         return render(request, 'frontend/create/student.html', context)
 
@@ -575,7 +575,7 @@ def settingsView(request, *args, **kwargs):
                 year_group = request.POST['yeargroup'],
                 gender = request.POST['gender']
             )
-            context["Message"] = "Sucessfully updated your details"
+            context["Message"] = "Successfully updated your details"
 
         currentUser = User.objects.get(pk=request.user.pk)
         currentUser.first_name = request.POST['firstname']

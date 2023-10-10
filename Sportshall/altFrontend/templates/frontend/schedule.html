@@ -251,17 +251,19 @@
     
     function displayEvents(){
         //console.log("Displaying...");
-        for(var row = 0; row < rows.length; row++){
+        for(var row = 1; row < rows.length; row++){
             //console.log("Row:" + row);
             for(var col = 0; col < columns.children.length; col++){
                 //console.log("Column:" + col);
-                if(rows[row].children[col].innerHTML == "" && typeof cellHtmlSet[invertDict(rowHeaders)[row]][invertDict(columnHeaders)[col]] != "undefined"){
-                    //row=0
-                    //col=0
-                    //rowHeaders[row] = time
-                    //cellHtmlSet[]
-                    rows[row].children[col].innerHTML += cellHtmlSet[invertDict(rowHeaders)[row]][invertDict(columnHeaders)[col]];
-                    //console.log(rows[row].children[col]);
+                if(rows[row].children[col].innerHTML == "" && typeof cellHtmlSet[invertDict(rowHeaders)[row]]!= "undefined"){
+                    if(typeof cellHtmlSet[invertDict(rowHeaders)[row]][invertDict(columnHeaders)[col]] != "undefined"){
+                      //row=0
+                      //col=0
+                      //rowHeaders[row] = time
+                      //cellHtmlSet[]
+                      rows[row].children[col].innerHTML += cellHtmlSet[invertDict(rowHeaders)[row]][invertDict(columnHeaders)[col]];
+                      //console.log(rows[row].children[col]);
+                    }
                 }
             }
         }
