@@ -13,7 +13,7 @@ This app is made with:
  * CSS
  * JavaScript
 
-## Accounts for Previewing
+## Accounts
 1. User Test
 
 **Username**: "Test" **Password**: "aEXrFBAE9xUc8qg"
